@@ -5,3 +5,5 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 print(tf.__version__)  # TensorFlowのバージョンを表示
+
+
