@@ -1,0 +1,38 @@
+# 仮想環境のフォルダ
+.venv/
+
+# Jupyter Notebook のチェックポイントファイル
+.ipynb_checkpoints/
+
+# Python のコンパイル済みファイル
+__pycache__/
+*.pyc
+*.pyo
+
+# データフォルダ（データはリモートリポジトリには含めない）
+data/raw/
+data/processed/
+
+# モデルの保存ファイル（大きなモデルファイルはリモートに含めない）
+models/
+
+# ログファイル
+logs/
+*.log
+
+# 実験結果や出力ファイル（結果の保存は必要な場合のみリモートに含める）
+results/figures/
+results/logs/
+
+# IDE設定ファイル（VSCodeやPyCharmなど）
+.vscode/
+.idea/
+
+# その他の一時ファイルやキャッシュ
+*.tmp
+*.bak
+*.swp
+
+# オペレーティングシステムの隠しファイル（MacやWindowsに特有のもの）
+.DS_Store
+Thumbs.db
