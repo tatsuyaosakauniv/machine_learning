@@ -10,11 +10,11 @@ __pycache__/
 *.pyo
 
 # データフォルダ（データはリモートリポジトリには含めない）
-data/raw/
-data/processed/
+# data/raw/
+# data/processed/
 
 # モデルの保存ファイル（大きなモデルファイルはリモートに含めない）
-models/
+# models/
 
 # ログファイル
 logs/
