@@ -36,3 +36,6 @@ results/logs/
 # オペレーティングシステムの隠しファイル（MacやWindowsに特有のもの）
 .DS_Store
 Thumbs.db
+
+# ワークスペース
+*.code-workspace

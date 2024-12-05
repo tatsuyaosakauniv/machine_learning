@@ -192,11 +192,11 @@ info = pd.concat([info,info_ad])
 #######################################################################################
 #--- パラメータ指定 1段階目
 """ 変数の説明
-menas                    :潜在変数生成機の入力乱数のガウス分布における平均値指定．  訳あって使わなくなった．
+means                    :潜在変数生成機の入力乱数のガウス分布における平均値指定．  訳あって使わなくなった．
 stds                     :潜在変数生成機の入力乱数のガウス分布における標準偏差指定．訳あって使わなくなった．
 random_uniform_inf       :潜在変数生成機の入力乱数の一様分布における下限． ↑のガウス分布の代わりに使うようになった
 random_uniform_sup       :潜在変数生成機の入力乱数の一様分布における上限． ↑のガウス分布の代わりに使うようになった
-menas2                   :生成機の入力乱数のガウス分布における平均値指定
+means2                   :生成機の入力乱数のガウス分布における平均値指定
 stds2                    :生成機の入力乱数のガウス分布における標準偏差指定．
 
 dim                      :MDデータの次元xyz
@@ -206,15 +206,15 @@ discriminator_extra_steps:判別機の学習回数/生成機の学習回数．  
 gen_lr                   :生成機の学習率
 disc_lr                  :判別機の学習率
 
-Normalize_axis           :潜在変数のにかける制約の方向（0でBatch_normalize, 1でLayer_normalize）
+Normalize_axis           :潜在変数にかける制約の方向（0でBatch_normalize, 1でLayer_normalize）
 """
 #!!!parameters
 
-# menas = 0
+# means = 0
 # stds = 0.2
 random_uniform_inf = 0
 random_uniform_sup = 1.0
-menas2 = 0              # meansとしたつもりが menasになってました．リトアニア語で"美術"だそうです
+means2 = 0              # menasはリトアニア語で"美術"だそうです
 stds2 = 1.0
 
 dim = 1
@@ -253,7 +253,7 @@ discriminator_optimizer = keras.optimizers.RMSprop(
 info_ad = pd.DataFrame(data=[["random_uniform_inf",random_uniform_inf]],columns = columns2)
 info = pd.concat([info,info_ad])
 
-info_ad = pd.DataFrame(data=[["means2",menas2]],columns = columns2)
+info_ad = pd.DataFrame(data=[["means2",means2]],columns = columns2)
 info = pd.concat([info,info_ad])
 
 info_ad = pd.DataFrame(data=[["random_uniform_sup",random_uniform_sup]],columns = columns2)
@@ -294,7 +294,7 @@ def normalize_latent(latent):
 #########################
 
 #-- input
-noise_inputs = tf.keras.Input(shape = (sequence_length,dim))#ガウスノイズ
+noise_inputs = tf.keras.Input(shape = (sequence_length,dim)) # ガウスノイズ
 c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
 flat_noise_g = tf.keras.layers.Flatten()(c_noise)
 innx = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal")(flat_noise_g)
@@ -476,7 +476,7 @@ def train_step(train_sample):
         with tf.GradientTape() as tape :
             #データ生成
             #ノイズ入力準備#########################################
-            noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = menas2,stddev = stds2)
+            noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = means2,stddev = stds2)
             #######################################################
 
             reconstruction = generator(noise_inputer,training = False)
@@ -506,7 +506,7 @@ def train_step(train_sample):
 
         #データ生成
         #ノイズ入力準備#########################################
-        noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = menas2,stddev = stds2)
+        noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = means2,stddev = stds2)
         #######################################################
 
         reconstruction = generator(noise_inputer,training = True)
@@ -678,7 +678,7 @@ info = info = pd.concat([info,info_ad])
 generator = gen_array[0]
 
 #ガウス分布乱数呼び出し
-noise_inputer = tf.random.normal([prediction_times,sequence_length,dim],mean = menas2,stddev = stds2)
+noise_inputer = tf.random.normal([prediction_times,sequence_length,dim],mean = means2,stddev = stds2)
 
 reconstruction_ini = generator.predict(noise_inputer)
 
@@ -691,7 +691,7 @@ for j in range(data_num):
 
     #サンプリング生成
     #ノイズ入力準備####################################
-    noise_inputer = tf.random.normal([prediction_times,sequence_length,dim],mean = menas2,stddev = stds2)
+    noise_inputer = tf.random.normal([prediction_times,sequence_length,dim],mean = means2,stddev = stds2)
     ##################################################
 
     reconstruction = generator.predict(noise_inputer)
