@@ -12,6 +12,9 @@ import matplotlib.ticker as ptick
 import os
 import time
 import pandas as pd
+
+matplotlib.rcParams['font.family'] = 'DejaVu Sans'  # 例: 安定したフォントを指定
+
 #------------------------------------------------------------------------------------
 
 #---   計算前のワークステーション設定
@@ -87,9 +90,9 @@ set_seed(1)
 #---   データ読み込み及び必要なパラメータの指定
 
 #フォルダとファイル名指定及びその読み込み
-address = r"/home/kawaguchi/src" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
+address = r"/home/kawaguchi/machine_learning/data" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "temp_ar1.dat" 
+DATA_filename = "flow_check_top_1122.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
@@ -119,12 +122,12 @@ info = pd.concat([info,info_ad])
 print("MD_DATA shape: ",np.shape(MD_DATA))
 
 data_of_MD = np.zeros(shape=(1,data_step,1))
-data_of_MD[0,:,0] = np.array(MD_DATA[:data_step,2]) #基本的に，配列はndarray型にする方が楽であるが，list型の方がメモリ量は少なく済むので，大きいデータを扱う時は要注意．
+data_of_MD[0,:,0] = np.array(MD_DATA[:data_step,1]) #基本的に，配列はndarray型にする方が楽であるが，list型の方がメモリ量は少なく済むので，大きいデータを扱う時は要注意．
 
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
-DATA_filename = "temp_ar1.dat"                   #学習用ファイル
+DATA_filename = "flow_check_top_1122.dat"                   #学習用ファイル
 data_name = address + DATA_filename
 
 TRAIN_DATA = np.loadtxt(data_name)
@@ -132,7 +135,7 @@ TRAIN_DATA = np.loadtxt(data_name)
 #学習データ成形-----------
 training_data = np.zeros(shape=(1,use_step,1))
 
-training_data[0,:,0] = np.array(TRAIN_DATA[:use_step,2])
+training_data[0,:,0] = np.array(TRAIN_DATA[:use_step,1])
 
 del MD_DATA     #メモリ不足が心配なので，デカいメモリ持ってそうな変数は動的にメモリ開放．なお，60000くらいのサイズなら全然大きくない．
 
@@ -597,7 +600,7 @@ for i in range(1,iteration_all+1):
 
     pass
 
-generator.save(r"/home/kawaguchi/MD-GAN/test/models/"+"MD_GAN_gen_"+str(save_count)+".h5")
+generator.save(r"/home/kawaguchi/machine_learning/model/"+"test_1205"+str(save_count)+".h5")
 gen_array.append(generator)
 save_count +=1
 
@@ -629,7 +632,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/trainin_proceed.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/trainin_proceed.png")
 plt.close()
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -645,7 +648,7 @@ info = pd.concat([info,info_ad])
 # for i in range(1,2):
 
 #     #load generator
-#     generator = keras.models.load_model(r"/home/kawaguchi/MD-GAN/test/models/"+"MD_GAN_gen_"+str(i)+".h5",compile = False)
+#     generator = keras.models.load_model(r"/home/kawaguchi/machine_learning/model/"+"test_1205"+str(i)+".h5",compile = False)
 #     gen_array.append(generator)
 #     pass
 
@@ -768,7 +771,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/"+Ar_displacement_filename[:-4]+".png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/"+Ar_displacement_filename[:-4]+".png")
 plt.close()
 
 ########################
@@ -840,7 +843,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_x.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_x.png")
 plt.close()
 
 #figure detail
@@ -868,7 +871,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_x.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_x.png")
 plt.close()
 
 
@@ -898,7 +901,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_y.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_y.png")
 plt.close()
 
 #figure detail
@@ -926,7 +929,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_y.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_y.png")
 plt.close()
 
 
@@ -955,7 +958,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_z.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_z.png")
 plt.close()
 
 #figure detail
@@ -983,7 +986,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_z.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_z.png")
 plt.close()
 
 #figure detail
@@ -1011,7 +1014,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"correct_GK.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"correct_GK.png")
 plt.close()
 
 #figure detail
@@ -1039,7 +1042,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"pred_GK.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_GK.png")
 plt.close()
 
 #figure detail
@@ -1067,7 +1070,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
 plt.close()
 
 
@@ -1119,7 +1122,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_x.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_x.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1145,7 +1148,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_x.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_x.png")
 plt.close()
 
 #figure detail
@@ -1173,7 +1176,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_y.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_y.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1199,7 +1202,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_y.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_y.png")
 plt.close()
 
 
@@ -1226,7 +1229,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_z.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_z.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1252,7 +1255,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_z.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_z.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1279,7 +1282,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1306,7 +1309,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1335,7 +1338,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
 plt.close()
 
 
@@ -1352,7 +1355,7 @@ info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = co
 info = pd.concat([info,info_ad])
 
 
-info.to_csv(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/info3.txt",index = False)
+info.to_csv(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/info3.txt",index = False)
 
 VACF_temp = []
 D_int_temp = []
@@ -1378,5 +1381,5 @@ for i in GK_int_orbits:
     pass
 
 
-np.savetxt(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/VACF.txt",VACF_temp)
-np.savetxt(r"/home/kawaguchi/MD-GAN/test/seed"+str(seed)+"/D_int.txt",D_int_temp)
+np.savetxt(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/VACF.txt",VACF_temp)
+np.savetxt(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/D_int.txt",D_int_temp)
