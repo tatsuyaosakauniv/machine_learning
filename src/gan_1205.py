@@ -632,7 +632,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/trainin_proceed.png")
+plt.savefig(r"/home/kawaguchi/machine_learning/result/training_proceed.png")
 plt.close()
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -658,7 +658,7 @@ info = pd.concat([info,info_ad])
 ############################    予測フェーズ開始  ####################################
 #######################################################################################
 
-t = 2.0 #時間刻み [fs]
+t = 1.0 #時間刻み [fs]
 
 ############################################################
 ####################### サンプル生成 ########################
@@ -818,176 +818,176 @@ orbits_GK_z = orbits_GK_z*10**10
 
 orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,correct_GK_x)
+# plt.plot(time,correct_GK_x)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_x.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_x.png")
+# plt.close()
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,orbits_GK_x)
+# plt.plot(time,orbits_GK_x)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_x.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_x.png")
+# plt.close()
 
 
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,correct_GK_y)
+# plt.plot(time,correct_GK_y)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK y [m$^2$/s$^2$]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("GK y [m$^2$/s$^2$]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_y.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_y.png")
+# plt.close()
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,orbits_GK_y)
+# plt.plot(time,orbits_GK_y)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_y.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_y.png")
+# plt.close()
 
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,correct_GK_z)
+# plt.plot(time,correct_GK_z)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK z [m$^2$/s$^2$]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("GK z [m$^2$/s$^2$]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_z.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_z.png")
+# plt.close()
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,orbits_GK_z)
+# plt.plot(time,orbits_GK_z)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_z.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_z.png")
+# plt.close()
 
 #figure detail
 
@@ -1106,193 +1106,193 @@ ax = fig.add_subplot(111)
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,GK_int_correct_x)
+# plt.plot(time,GK_int_correct_x)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_x.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_x.png")
+# plt.close()
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,GK_int_orbits_x)
+# plt.plot(time,GK_int_orbits_x)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_x.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_x.png")
+# plt.close()
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,GK_int_correct_y)
+# plt.plot(time,GK_int_correct_y)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_y.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_y.png")
+# plt.close()
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,GK_int_orbits_y)
+# plt.plot(time,GK_int_orbits_y)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_y.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_y.png")
+# plt.close()
 
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,GK_int_correct_z)
+# plt.plot(time,GK_int_correct_z)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_z.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_z.png")
+# plt.close()
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-plt.plot(time,GK_int_orbits_z)
+# plt.plot(time,GK_int_orbits_z)
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_z.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_z.png")
+# plt.close()
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
-ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
-plt.plot(time,GK_int_correct,color="red")
+# ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
+# plt.plot(time,GK_int_correct,color="red")
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+# plt.xlabel("time [ps]",fontsize = 30)
+# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int.png")
+# plt.close()
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
+# #------------------------
 
 ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
 plt.plot(time,GK_int_orbits)
