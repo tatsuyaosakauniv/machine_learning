@@ -122,8 +122,8 @@ info = pd.concat([info,info_ad])
 #予測データとの比較用のMDデータ成形（つまり，test data）-----------
 print("MD_DATA shape: ",np.shape(MD_DATA))
 
-data_of_MD = np.zeros(shape=(1,data_step,1))
-data_of_MD[0,:,0] = np.array(MD_DATA[:data_step,1]) #基本的に，配列はndarray型にする方が楽であるが，list型の方がメモリ量は少なく済むので，大きいデータを扱う時は要注意．
+data_of_MD = np.zeros(shape=(1,data_step))
+data_of_MD[0,:] = np.array(MD_DATA[:data_step]) #基本的に，配列はndarray型にする方が楽であるが，list型の方がメモリ量は少なく済むので，大きいデータを扱う時は要注意．
 
 
 #学習データの成形（つまり，train data）-----------
@@ -134,9 +134,9 @@ data_name = address + DATA_filename
 TRAIN_DATA = np.loadtxt(data_name)
 
 #学習データ成形-----------
-training_data = np.zeros(shape=(1,use_step,1))
+training_data = np.zeros(shape=(1,use_step))
 
-training_data[0,:,0] = np.array(TRAIN_DATA[:use_step,1])
+training_data[0,:] = np.array(TRAIN_DATA[:use_step])
 
 del MD_DATA     #メモリ不足が心配なので，デカいメモリ持ってそうな変数は動的にメモリ開放．なお，60000くらいのサイズなら全然大きくない．
 
@@ -295,7 +295,7 @@ def normalize_latent(latent):
 #########################
 
 #-- input
-noise_inputs = tf.keras.Input(shape = (sequence_length,dim)) # ガウスノイズ
+noise_inputs = tf.keras.Input(shape = (sequence_length)) # ガウスノイズ
 c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
 flat_noise_g = tf.keras.layers.Flatten()(c_noise)
 innx = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal")(flat_noise_g)
@@ -320,7 +320,7 @@ generator.summary()
 #############################
 
 #-- input
-disc_inputs = keras.Input(shape = (sequence_length,dim))
+disc_inputs = keras.Input(shape = (sequence_length))
 
 #-- hidden layers
 dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
@@ -477,12 +477,12 @@ def train_step(train_sample):
         with tf.GradientTape() as tape :
             #データ生成
             #ノイズ入力準備#########################################
-            noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = means2,stddev = stds2)
+            noise_inputer = tf.random.normal([batch_size,sequence_length],mean = means2,stddev = stds2)
             #######################################################
 
             reconstruction = generator(noise_inputer,training = False)
             
-            reconstruction = tf.reshape(reconstruction,[batch_size,sequence_length,dim])
+            reconstruction = tf.reshape(reconstruction,[batch_size,sequence_length])
 
             #偽データの評価値生成
             fake_logits_temp = discriminator(reconstruction,training = True)
@@ -507,12 +507,12 @@ def train_step(train_sample):
 
         #データ生成
         #ノイズ入力準備#########################################
-        noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = means2,stddev = stds2)
+        noise_inputer = tf.random.normal([batch_size,sequence_length],mean = means2,stddev = stds2)
         #######################################################
 
         reconstruction = generator(noise_inputer,training = True)
         
-        reconstruction = tf.reshape(reconstruction,[batch_size,sequence_length,dim])
+        reconstruction = tf.reshape(reconstruction,[batch_size,sequence_length])
 
         #偽データの評価値生成
         fake_logits_temp = discriminator(reconstruction,training = False)
@@ -565,7 +565,7 @@ dL_list = []
 
 #         temp = []
 #         for j in range(data_length):
-#             temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length,:])
+#             temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
 #         train_data = np.array(temp)
 #         pass
 # print(np.shape(training_data))
@@ -576,7 +576,7 @@ dL_list = []
 
 #     temp = []
 #     for j in range(data_length):
-#         temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length,:])
+#         temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
 #     train_data = np.array(temp)
 #     pass
     
@@ -659,7 +659,7 @@ print("gen_array :",len(gen_array))
 ############################    予測フェーズ開始  ####################################
 #######################################################################################
 
-t = 1.0 #時間刻み [fs]
+# t = 1.0 #時間刻み [fs]    <------------------------------------------------------------------------------おそらく使ってない
 
 ############################################################
 ####################### サンプル生成 ########################
@@ -679,11 +679,11 @@ info = info = pd.concat([info,info_ad])
 generator = gen_array[0]
 
 #ガウス分布乱数呼び出し
-noise_inputer = tf.random.normal([prediction_times,sequence_length,dim],mean = means2,stddev = stds2)
+noise_inputer = tf.random.normal([prediction_times,sequence_length],mean = means2,stddev = stds2)
 
 reconstruction_ini = generator.predict(noise_inputer)
 
-reconstruction_ini = tf.reshape(reconstruction_ini,[prediction_times,sequence_length,dim])
+reconstruction_ini = tf.reshape(reconstruction_ini,[prediction_times,sequence_length])
 
 orbit_per_onemol = reconstruction_ini
 
@@ -692,12 +692,12 @@ for j in range(data_num):
 
     #サンプリング生成
     #ノイズ入力準備####################################
-    noise_inputer = tf.random.normal([prediction_times,sequence_length,dim],mean = means2,stddev = stds2)
+    noise_inputer = tf.random.normal([prediction_times,sequence_length],mean = means2,stddev = stds2)
     ##################################################
 
     reconstruction = generator.predict(noise_inputer)
 
-    reconstruction = tf.reshape(reconstruction,[prediction_times,sequence_length,dim])
+    reconstruction = tf.reshape(reconstruction,[prediction_times,sequence_length])
 
     #データ追加#######################################
     orbit_per_onemol = np.concatenate([orbit_per_onemol,reconstruction],axis = 1)
@@ -711,11 +711,11 @@ orbits = orbit_per_onemol
 
 orbits = np.array(orbits)
 
-print(np.shape(orbits))         # [1, 65000, 1]
-print(np.shape(data_of_MD))     # [1, 60000, 1]
+print(np.shape(orbits))
+print(np.shape(data_of_MD))
 
 #domain knowledge による補正
-orbits[:,:,0] = orbits[:,:,0]*STD_DATA+ AVERAGE_DATA
+orbits[:,:] = orbits[:,:]*STD_DATA+ AVERAGE_DATA
 
 ####################################
 """
@@ -759,7 +759,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 #prediction displacement------------------------
 time_step = np.arange(1,np.shape(orbits[i])[0]+1)
 ax.plot(time_step,orbits[i])
-ax.plot(time_step,correct_disp[0,0,:],color = "red")
+ax.plot(time_step,correct_disp[0,0],color = "red")
 
 
 ax.set_xlabel("step",fontsize = 30)
@@ -783,42 +783,47 @@ plt.close()
 print(np.shape(correct_disp))
 print(np.shape(orbits))
 
+correct_GK = np.zeros((nmsdtime))
+# correct_GK_x = np.zeros((nmsdtime))
+# correct_GK_y = np.zeros((nmsdtime))
+# correct_GK_z = np.zeros((nmsdtime))
 
-correct_GK_x = np.zeros((nmsdtime))
-correct_GK_y = np.zeros((nmsdtime))
-correct_GK_z = np.zeros((nmsdtime))
-
-orbits_GK_x = np.zeros((nmsdtime))
-orbits_GK_y = np.zeros((nmsdtime))
-orbits_GK_z = np.zeros((nmsdtime))
+orbits_GK = np.zeros((nmsdtime))
+# orbits_GK_x = np.zeros((nmsdtime))
+# orbits_GK_y = np.zeros((nmsdtime))
+# orbits_GK_z = np.zeros((nmsdtime))
 
 
 
 for j in range(n_picking):
-    correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,j*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
-    correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,1]*np.broadcast_to(correct_disp[:,j*shift_msd,1][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,1]))),axis = 0)/n_picking
-    correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,2]*np.broadcast_to(correct_disp[:,j*shift_msd,2][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,2]))),axis = 0)/n_picking
+    correct_GK = correct_GK*10**10
+    # correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    # correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    # correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
 
-    orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,j*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
-    orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,1]*np.broadcast_to(orbits[:,j*shift_msd,1][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,1]))),axis = 0)/n_picking
-    orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,2]*np.broadcast_to(orbits[:,j*shift_msd,2][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,2]))),axis = 0)/n_picking
+    orbits_GK = orbits_GK + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    # orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    # orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    # orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
     pass
 
 ####
 
 time = np.arange(1,nmsdtime+1)*stepskip*dt*10**(-3)
 
-correct_GK_x = correct_GK_x*10**10
-correct_GK_y = correct_GK_y*10**10
-correct_GK_z = correct_GK_z*10**10
+correct_GK = correct_GK*10**10
+# correct_GK_x = correct_GK_x*10**10
+# correct_GK_y = correct_GK_y*10**10
+# correct_GK_z = correct_GK_z*10**10
 
-correct_GK = (correct_GK_x+correct_GK_y+correct_GK_z)/3
+# correct_GK = (correct_GK_x+correct_GK_y+correct_GK_z)/3
 
-orbits_GK_x = orbits_GK_x*10**10
-orbits_GK_y = orbits_GK_y*10**10
-orbits_GK_z = orbits_GK_z*10**10
+correct_GK = correct_GK*10**10
+# orbits_GK_x = orbits_GK_x*10**10
+# orbits_GK_y = orbits_GK_y*10**10
+# orbits_GK_z = orbits_GK_z*10**10
 
-orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
+# orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 
 # #figure detail
 
@@ -1076,27 +1081,31 @@ plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_
 plt.close()
 
 
+GK_int_correct = np.zeros((nmsdtime-1))
+# GK_int_correct_x = np.zeros((nmsdtime-1))
+# GK_int_correct_y = np.zeros((nmsdtime-1))
+# GK_int_correct_z = np.zeros((nmsdtime-1))
 
-GK_int_correct_x = np.zeros((nmsdtime-1))
-GK_int_correct_y = np.zeros((nmsdtime-1))
-GK_int_correct_z = np.zeros((nmsdtime-1))
-
-GK_int_orbits_x = np.zeros((nmsdtime-1))
-GK_int_orbits_y = np.zeros((nmsdtime-1))
-GK_int_orbits_z = np.zeros((nmsdtime-1))
+GK_int_orbits = np.zeros((nmsdtime-1))
+# GK_int_orbits_x = np.zeros((nmsdtime-1))
+# GK_int_orbits_y = np.zeros((nmsdtime-1))
+# GK_int_orbits_z = np.zeros((nmsdtime-1))
 
 for i in range(0,nmsdtime-1-1):
-    GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
-    GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
-    GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
 
-    GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
-    GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
-    GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
+    GK_int_correct[i+1] = GK_int_correct[i] + ((correct_GK[i]+correct_GK[i+1])/2.0)*dt*stepskip*10**(-15)
+    # GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
+    # GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
+    # GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
+
+    GK_int_orbits[i+1]  = GK_int_orbits[i] + ((orbits_GK[i]+orbits_GK[i+1])/2.0)*dt*stepskip*10**(-15)
+    # GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
+    # GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
+    # GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
     pass
 
-GK_int_correct = (GK_int_correct_x+GK_int_correct_y+GK_int_correct_z)/3
-GK_int_orbits = (GK_int_orbits_x+GK_int_orbits_y+GK_int_orbits_z)/3
+# GK_int_correct = (GK_int_correct_x+GK_int_correct_y+GK_int_correct_z)/3
+# GK_int_orbits = (GK_int_orbits_x+GK_int_orbits_y+GK_int_orbits_z)/3
 
 time = np.arange(1,nmsdtime)*stepskip*dt*10**(-3)
 #figure detail
@@ -1109,191 +1118,7 @@ ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # #------------------------
-
-# plt.plot(time,GK_int_correct_x)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_x.png")
-# plt.close()
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,GK_int_orbits_x)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_x.png")
-# plt.close()
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,GK_int_correct_y)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_y.png")
-# plt.close()
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,GK_int_orbits_y)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_y.png")
-# plt.close()
-
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,GK_int_correct_z)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_z.png")
-# plt.close()
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,GK_int_orbits_z)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_z.png")
-# plt.close()
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
-# plt.plot(time,GK_int_correct,color="red")
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int.png")
-# plt.close()
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
+# x, y, z は省略
 # #------------------------
 
 ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
