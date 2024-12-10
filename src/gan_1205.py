@@ -62,10 +62,10 @@ class FixedOrderFormatter(ScalarFormatter):
     def _set_order_of_magnitude(self):
         self.orderOfMagnitude = self._order_of_mag
 
-# いつかは出来るようにしたいけど，linuxでのTimes New Romanでの描画はFontがないですって言われる．一応エラー文みたいなのが出るけど問題なく回る．
-# TImes New Romanを使いたくて色々やってたら仮想環境が全部吹き飛んだので諦める．キレそう．
-plt.rcParams['font.family'] = 'Times New Roman'
-plt.rcParams["mathtext.fontset"]="stix"
+# いつかは出来るようにしたいけど，linuxでのLiberation Sansでの描画はFontがないですって言われる．一応エラー文みたいなのが出るけど問題なく回る．
+# Liberation Sansを使いたくて色々やってたら仮想環境が全部吹き飛んだので諦める．キレそう．
+plt.rcParams['font.family'] = 'Liberation Sans'
+plt.rcParams["mathtext.fontset"]="STIX"
 
 #------------------------------------------------------------------------------------
 
@@ -109,8 +109,8 @@ fs = 1.0E-15
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 60000 #MDのサンプルから取り出してくるデータ長
-use_step = 20000   #学習に使うデータ長
+data_step = 1000000 #MDのサンプルから取り出してくるデータ長
+use_step = 10000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -118,6 +118,9 @@ info = pd.DataFrame(data = [["data_step",data_step]],columns= columns2)
 info_ad = pd.DataFrame(data=[["use_step",use_step]],columns = columns2)
 info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# ###予測データとの比較用にMDデータの処理
+# correct_disp = np.zeros(shape =(Ar_molnum,dimension,data_step))
 
 #予測データとの比較用のMDデータ成形（つまり，test data）-----------
 print("MD_DATA shape: ",np.shape(MD_DATA))
@@ -756,10 +759,13 @@ ax = fig.add_subplot(111)
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
+print(np.shape(orbits))  # 配列の形状
+print(i)  # インデックスの値
+
 #prediction displacement------------------------
-time_step = np.arange(1,np.shape(orbits[i])[0]+1)
-ax.plot(time_step,orbits[i])
-ax.plot(time_step,correct_disp[0,0,:],color = "red")
+time_step = np.arange(1,np.shape(orbits[0])[0]+1)
+ax.plot(time_step,orbits[0])
+# ax.plot(time_step,correct_disp[0,0,:],color = "red")
 
 
 ax.set_xlabel("step",fontsize = 30)
@@ -780,7 +786,7 @@ plt.close()
 #####  Green-Kubo  #####
 ########################
 
-print(np.shape(correct_disp))
+# print(np.shape(correct_disp))
 print(np.shape(orbits))
 
 

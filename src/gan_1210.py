@@ -64,8 +64,8 @@ class FixedOrderFormatter(ScalarFormatter):
 
 # いつかは出来るようにしたいけど，linuxでのTimes New Romanでの描画はFontがないですって言われる．一応エラー文みたいなのが出るけど問題なく回る．
 # TImes New Romanを使いたくて色々やってたら仮想環境が全部吹き飛んだので諦める．キレそう．
-plt.rcParams['font.family'] = 'Times New Roman'
-plt.rcParams["mathtext.fontset"]="stix"
+plt.rcParams['font.family'] = 'Liberation Sans'
+plt.rcParams["mathtext.fontset"]="STIX"
 
 #------------------------------------------------------------------------------------
 
@@ -109,8 +109,8 @@ fs = 1.0E-15
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 60000 #MDのサンプルから取り出してくるデータ長
-use_step = 20000   #学習に使うデータ長
+data_step = 1000000 #MDのサンプルから取り出してくるデータ長
+use_step = 10000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -122,9 +122,11 @@ info = pd.concat([info,info_ad])
 #予測データとの比較用のMDデータ成形（つまり，test data）-----------
 print("MD_DATA shape: ",np.shape(MD_DATA))
 
-data_of_MD = np.zeros(shape=(1,data_step))
-data_of_MD[0,:] = np.array(MD_DATA[:data_step]) #基本的に，配列はndarray型にする方が楽であるが，list型の方がメモリ量は少なく済むので，大きいデータを扱う時は要注意．
+data_of_MD = np.zeros(shape=(data_step, 2))
 
+#基本的に，配列はndarray型にする方が楽であるが，list型の方がメモリ量は少なく済むので，大きいデータを扱う時は要注意．
+data_of_MD[:, 0] = np.array(MD_DATA[:data_step, 0])     # 時間
+data_of_MD[:, 1] = np.array(MD_DATA[:data_step, 1])     # 熱流束
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
@@ -134,9 +136,10 @@ data_name = address + DATA_filename
 TRAIN_DATA = np.loadtxt(data_name)
 
 #学習データ成形-----------
-training_data = np.zeros(shape=(1,use_step))
+training_data = np.zeros(shape=(use_step, 2))
 
-training_data[0,:] = np.array(TRAIN_DATA[:use_step])
+training_data[:, 0] = np.array(TRAIN_DATA[:use_step, 0])     # 時間
+training_data[:, 1] = np.array(TRAIN_DATA[:use_step, 1])     # 熱流束
 
 del MD_DATA     #メモリ不足が心配なので，デカいメモリ持ってそうな変数は動的にメモリ開放．なお，60000くらいのサイズなら全然大きくない．
 
