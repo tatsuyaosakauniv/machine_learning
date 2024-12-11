@@ -69,7 +69,7 @@ for seed in seed_list:
     set_seed(seed)
 
     #open check
-    np.savetxt(r"/home/s_tanaka/MD-GAN/case8/seed"+str(seed)+"/open_check.txt",[seed])
+    np.savetxt(r"/home/s_tanaka/MD-GAN/case8/seed"+str(seed)+"/open_check.txt",[seed]) # seed番号を記録
 
     address = r"/home/s_tanaka/result/pat8" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
@@ -107,21 +107,18 @@ for seed in seed_list:
     data_step = 100000 #MDのサンプルから取り出してくるデータ長
     use_step = 30000   #学習に使うデータ長
 
-
-
     Ar_molnum = nx_ar*ny_ar*nz_ar #MDの総分子数
 
+    #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
     columns2 = ["parameter","value"]
-
     info = pd.DataFrame(data = [["data_step",data_step]],columns= columns2)
-
-
     info_ad = pd.DataFrame(data=[["use_step",use_step]],columns = columns2)
     info = pd.concat([info,info_ad])
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     allmolnum = 1000
 
-    dimension = 3
+    dimension = 3  # 次元   熱流束の場合必要ない
 
     point_mol_num = 1000   #比較用の分子数
 
@@ -130,7 +127,7 @@ for seed in seed_list:
 
 
     ###予測データとの比較用にMDデータの処理
-    correct_disp = np.zeros(shape =(Ar_molnum,dimension,data_step))
+    # correct_disp = np.zeros(shape =(Ar_molnum,dimension,data_step))   # 後で定義しているので、必要ない？
 
     #######################################
     """
@@ -222,6 +219,7 @@ for seed in seed_list:
     print(Ar_disp)
     print(np.shape(Ar_disp))
 
+    # x, y, z それぞれで標準化している
     average_Ar_dispx = np.average(Ar_disp[:,0,:])
     std_Ar_dispx = np.std(Ar_disp[:,0,:])
     Ar_disp[:,0,:] = (Ar_disp[:,0,:]-average_Ar_dispx)/std_Ar_dispx
@@ -262,10 +260,10 @@ for seed in seed_list:
     batch_size           : バッチ数
     all_data_NUM         : 今回のプログラム実行で必要となるデータ総数．
     """
-    #Ar_disp = [分子番号,次元,トラジェクトリ]
+    #Ar_disp = [分子番号,次元,トラジェクトリ]　<-----------------------------------------------------------------------------!!!!!!重要!!!!!!
     print(Ar_disp)
     Ar_disp = np.transpose(Ar_disp,(0,2,1))
-    #Ar_disp = [分子番号,トラジェクトリ,次元]
+    #Ar_disp = [分子番号,トラジェクトリ,次元]   <------------------------------------------------------------------------ 時間の入力がない？？
     print(np.shape(Ar_disp))
 
     sequence_length = 64
@@ -339,45 +337,30 @@ for seed in seed_list:
         learning_rate = disc_lr
     )
 
+    #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
     info_ad = pd.DataFrame(data=[["latent_dims",latent_dim]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["random_uniform_inf",random_uniform_inf]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["means2",menas2]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["random_uniform_sup",random_uniform_sup]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["std2",stds2]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["discriminator_extra_steps",discriminator_extra_steps]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["latent_lr",latent_lr]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["gen_lr",gen_lr]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
     info_ad = pd.DataFrame(data=[["disc_lr",disc_lr]],columns = columns2)
-
     info = pd.concat([info,info_ad])
-
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     gen_array = []
     latent_gen_array = []
+
     ###############
     #自作の色々欄
     class Normalization(tf.keras.layers.Layer): #入力値をmean,stdとなるようにする．
@@ -557,7 +540,7 @@ for seed in seed_list:
     train_gz_loss = tf.keras.metrics.Mean()
 
     @tf.function()
-    def save_judge(train_sample,latent):
+    def save_judge(train_sample,latent):    # 追加されてる　あんまりわからん
 
         #潜在変数生成
         random_noise = tf.random.uniform([batch_size,latent_dim],minval = random_uniform_inf,maxval = random_uniform_sup)
@@ -680,6 +663,8 @@ for seed in seed_list:
         ########################
         for l in range(d_steps_add):
             with tf.GradientTape() as tape :
+                # 潜在変数部分が追加されてる
+
                 #潜在変数生成
                 random_noise = tf.random.uniform([batch_size,latent_dim],minval = random_uniform_inf,maxval = random_uniform_sup)
                 latent = latent_gen([latent_input,random_noise],training = False)
@@ -696,7 +681,7 @@ for seed in seed_list:
 
                 latent3 = normalize_latent(latent3)
 
-                #データ生成
+                #データ生成             reconstruction がなんか増えてる
                 #ノイズ入力準備#########################################
                 noise_inputer = tf.random.normal([batch_size,sequence_length,dim],mean = menas2,stddev = stds2)
                 #######################################################
@@ -956,12 +941,15 @@ for seed in seed_list:
         average_g_loss = train_g_loss.result()
         average_gz_loss = train_gz_loss.result()
 
+        #loss 画面表示
         print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}, gz_loss: {:4f}".format(i+1,average_d_loss,average_g_loss,average_gz_loss))
 
+        #loss値のリセット
         train_d_loss.reset_states()
         train_g_loss.reset_states()
         train_gz_loss.reset_states()
 
+        #学習曲線のリストメイク
         iteration_list.append(counter_for_iteration)
         gL_list.append(average_g_loss)
         latent_gL_list.append(average_gz_loss)

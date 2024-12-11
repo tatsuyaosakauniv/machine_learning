@@ -143,6 +143,7 @@ del MD_DATA     #メモリ不足が心配なので，デカいメモリ持って
 AVERAGE_DATA = np.average(training_data)
 STD_DATA = np.std(training_data)
 training_data = (training_data-AVERAGE_DATA)/STD_DATA
+# ↑ ------------------------------------------------------ まとめて標準化しちゃだめな気がする
 
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -277,6 +278,8 @@ info = pd.concat([info,info_ad])
 def Linear_tanh(z,alpha = 0.16):            #MLpotentialなんかではこういう活性化関数が使われる．試しに使ってみたけど中々よさそう．
     return alpha*z + tf.math.tanh(z)
 
+ # !!!!!!!!!!!!--------------------こっちのコードでは潜在変数を使ってないので注意
+ 
 #潜在変数にかける補正．要らない時はreturnとdef部以外をコメントアウト． ちなみにbatch数1とかではNormalize_axis=0は使うべきではない．
 def normalize_latent(latent):
     # latent_mean = tf.math.reduce_mean(latent,axis=Normalize_axis,keepdims=True)
@@ -320,7 +323,7 @@ disc_inputs = keras.Input(shape = (sequence_length,dim))
 
 #-- hidden layers
 dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
-flat = layers.Flatten()(dc1)
+flat = layers.Flatten()(dc1)    # 多次元を1次元にする関数
 
 
 #
