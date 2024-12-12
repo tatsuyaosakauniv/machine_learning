@@ -65,7 +65,7 @@ class FixedOrderFormatter(ScalarFormatter):
 # いつかは出来るようにしたいけど，linuxでのTimes New Romanでの描画はFontがないですって言われる．一応エラー文みたいなのが出るけど問題なく回る．
 # TImes New Romanを使いたくて色々やってたら仮想環境が全部吹き飛んだので諦める．キレそう．
 plt.rcParams['font.family'] = 'Liberation Sans'
-plt.rcParams["mathtext.fontset"]="STIX"
+plt.rcParams["mathtext.fontset"]="stix"
 
 #------------------------------------------------------------------------------------
 
@@ -91,9 +91,9 @@ set_seed(1)
 #---   データ読み込み及び必要なパラメータの指定
 
 #フォルダとファイル名指定及びその読み込み
-address = r"/home/kawaguchi/machine_learning/data" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
+address = r"/home/kawaguchi/data" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "flow_check_top_1125.dat" 
+DATA_filename = "flow_check_top_1211.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
@@ -110,7 +110,7 @@ fs = 1.0E-15
 #データ前処理用の色々
 #!!!parameters
 data_step = 100000 #MDのサンプルから取り出してくるデータ長
-use_step = 10000   #学習に使うデータ長
+use_step = 30000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -118,6 +118,13 @@ info = pd.DataFrame(data = [["data_step",data_step]],columns= columns2)
 info_ad = pd.DataFrame(data=[["use_step",use_step]],columns = columns2)
 info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+point_mol_num = 1
+
+###予測データとの比較用にMDデータの処理
+correct_disp = np.zeros(shape =(point_mol_num,data_step))
+
+correct_disp[0, :] = np.array(MD_DATA[:data_step, 1])
 
 #予測データとの比較用のMDデータ成形（つまり，test data）-----------
 print("MD_DATA shape: ",np.shape(MD_DATA))
@@ -129,7 +136,7 @@ data_of_MD[0, :, 0] = np.array(MD_DATA[:data_step, 1])     # 熱流束
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
-DATA_filename = "flow_check_top_1125.dat"                   #学習用ファイル
+DATA_filename = "flow_check_top_1211.dat"                   #学習用ファイル
 data_name = address + DATA_filename
 
 TRAIN_DATA = np.loadtxt(data_name)
@@ -295,7 +302,7 @@ def normalize_latent(latent):
 #########################
 
 #-- input
-noise_inputs = tf.keras.Input(shape = (sequence_length)) # ガウスノイズ
+noise_inputs = tf.keras.Input(shape = (sequence_length, dim)) # ガウスノイズ
 c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
 flat_noise_g = tf.keras.layers.Flatten()(c_noise)
 innx = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal")(flat_noise_g)
@@ -320,7 +327,7 @@ generator.summary()
 #############################
 
 #-- input
-disc_inputs = keras.Input(shape = (sequence_length))
+disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
 dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0.3),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
@@ -477,12 +484,12 @@ def train_step(train_sample):
         with tf.GradientTape() as tape :
             #データ生成
             #ノイズ入力準備#########################################
-            noise_inputer = tf.random.normal([batch_size,sequence_length],mean = means2,stddev = stds2)
+            noise_inputer = tf.random.normal([batch_size, sequence_length, dim],mean = means2,stddev = stds2)
             #######################################################
 
             reconstruction = generator(noise_inputer,training = False)
             
-            reconstruction = tf.reshape(reconstruction,[batch_size,sequence_length])
+            reconstruction = tf.reshape(reconstruction,[batch_size, sequence_length, dim])
 
             #偽データの評価値生成
             fake_logits_temp = discriminator(reconstruction,training = True)
@@ -507,12 +514,12 @@ def train_step(train_sample):
 
         #データ生成
         #ノイズ入力準備#########################################
-        noise_inputer = tf.random.normal([batch_size,sequence_length],mean = means2,stddev = stds2)
+        noise_inputer = tf.random.normal([batch_size, sequence_length, dim],mean = means2,stddev = stds2)
         #######################################################
 
         reconstruction = generator(noise_inputer,training = True)
         
-        reconstruction = tf.reshape(reconstruction,[batch_size,sequence_length])
+        reconstruction = tf.reshape(reconstruction,[batch_size, sequence_length, dim])
 
         #偽データの評価値生成
         fake_logits_temp = discriminator(reconstruction,training = False)
@@ -601,7 +608,7 @@ dL_list = []
 
 #     pass
 
-# generator.save(r"/home/kawaguchi/machine_learning/model/"+"test_1205"+str(save_count)+".h5")
+# generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
 # gen_array.append(generator)
 # save_count +=1
 
@@ -631,10 +638,10 @@ ax.minorticks_on()
 
 ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
+plt.savefig(r"/home/kawaguchi/result/training_proceed.png")
+
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/training_proceed.png")
-plt.close()
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 info_ad = pd.DataFrame(data=[["passed model",len(gen_array)]],columns = columns2)
@@ -649,7 +656,7 @@ gen_array = []
 for i in range(1,2):
 
     #load generator
-    generator = keras.models.load_model(r"/home/kawaguchi/machine_learning/model/"+"test_1205"+str(i)+".h5",compile = False)
+    generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
     gen_array.append(generator)
     pass
 
@@ -658,8 +665,6 @@ print("gen_array :",len(gen_array))
 #######################################################################################
 ############################    予測フェーズ開始  ####################################
 #######################################################################################
-
-# t = 1.0 #時間刻み [fs]    <------------------------------------------------------------------------------おそらく使ってない
 
 ############################################################
 ####################### サンプル生成 ########################
@@ -679,11 +684,11 @@ info = info = pd.concat([info,info_ad])
 generator = gen_array[0]
 
 #ガウス分布乱数呼び出し
-noise_inputer = tf.random.normal([prediction_times,sequence_length],mean = means2,stddev = stds2)
+noise_inputer = tf.random.normal([prediction_times, sequence_length, dim],mean = means2,stddev = stds2)
 
 reconstruction_ini = generator.predict(noise_inputer)
 
-reconstruction_ini = tf.reshape(reconstruction_ini,[prediction_times,sequence_length])
+reconstruction_ini = tf.reshape(reconstruction_ini,[prediction_times, sequence_length, dim])
 
 orbit_per_onemol = reconstruction_ini
 
@@ -692,36 +697,36 @@ for j in range(data_num):
 
     #サンプリング生成
     #ノイズ入力準備####################################
-    noise_inputer = tf.random.normal([prediction_times,sequence_length],mean = means2,stddev = stds2)
+    noise_inputer = tf.random.normal([prediction_times, sequence_length, dim],mean = means2,stddev = stds2)
     ##################################################
 
     reconstruction = generator.predict(noise_inputer)
 
-    reconstruction = tf.reshape(reconstruction,[prediction_times,sequence_length])
+    reconstruction = tf.reshape(reconstruction,[prediction_times, sequence_length, dim])
 
     #データ追加#######################################
     orbit_per_onemol = np.concatenate([orbit_per_onemol,reconstruction],axis = 1)
     pass
 
 #一つのモデルから得られるトラジェクトリ数をリストに収める．
-orbits = orbit_per_onemol
+flow = orbit_per_onemol
 
 #-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#
 
 
-orbits = np.array(orbits)
+flow = np.array(flow)
 
-print(np.shape(orbits))
+print("flow", np.shape(flow))
 print(np.shape(data_of_MD))
 
 #domain knowledge による補正
-orbits[:,:] = orbits[:,:]*STD_DATA+ AVERAGE_DATA
+flow[:,:,0] = flow[:,:,0]*STD_DATA+ AVERAGE_DATA
 
 ####################################
 """
 この行時点でのトラジェクトリの形状を開設する．
 
-orbits[分子番号,余計な項,分子の軌跡,xyz]
+orbits[分子番号,余計な項,分子の軌跡,xyz]    --> 名前をflowに変更
 
 ・分子番号 ; 分子の番号．
 ・余計な項 ; 生成モデルに入力する際にCNNを使うとき，(200,)は受け取れない．CNN入力層の入力サイズは(200,1)の形状を取っている必要がある．その名残
@@ -757,13 +762,15 @@ ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #prediction displacement------------------------
-time_step = np.arange(1,np.shape(orbits[i])[0]+1)
-ax.plot(time_step,orbits[i])
-ax.plot(time_step,correct_disp[0,0],color = "red")
+time_step = np.arange(1,np.shape(flow[0])[0]+1)
+ax.plot(time_step,flow[0])
+
+time_step = np.arange(1,np.shape(correct_disp[0])[0]+1)
+ax.plot(time_step,correct_disp[0],color = "red")
 
 
 ax.set_xlabel("step",fontsize = 30)
-ax.set_ylabel("velocity",fontsize = 30)
+ax.set_ylabel("heatflux",fontsize = 30)
 
 # ax.legend(fontsize = 30)
 
@@ -773,7 +780,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/"+Ar_displacement_filename[:-4]+".png")
+plt.savefig(r"/home/kawaguchi/result/heatflux.png")
 plt.close()
 
 ########################
@@ -781,7 +788,7 @@ plt.close()
 ########################
 
 print(np.shape(correct_disp))
-print(np.shape(orbits))
+print(np.shape(flow))
 
 correct_GK = np.zeros((nmsdtime))
 # correct_GK_x = np.zeros((nmsdtime))
@@ -801,7 +808,7 @@ for j in range(n_picking):
     # correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
     # correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
 
-    orbits_GK = orbits_GK + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    orbits_GK = orbits_GK + np.average(flow[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(flow[:,j*shift_msd][:, np.newaxis],(np.shape(flow[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
     # orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
     # orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
     # orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
@@ -850,7 +857,7 @@ correct_GK = correct_GK*10**10
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_x.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_x.png")
 # plt.close()
 
 # #figure detail
@@ -878,7 +885,7 @@ correct_GK = correct_GK*10**10
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_x.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_x.png")
 # plt.close()
 
 
@@ -908,7 +915,7 @@ correct_GK = correct_GK*10**10
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_y.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_y.png")
 # plt.close()
 
 # #figure detail
@@ -936,7 +943,7 @@ correct_GK = correct_GK*10**10
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_y.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_y.png")
 # plt.close()
 
 
@@ -965,7 +972,7 @@ correct_GK = correct_GK*10**10
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_z.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_z.png")
 # plt.close()
 
 # #figure detail
@@ -993,7 +1000,7 @@ correct_GK = correct_GK*10**10
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_z.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_z.png")
 # plt.close()
 
 #figure detail
@@ -1021,7 +1028,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"correct_GK.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"correct_GK.png")
 plt.close()
 
 #figure detail
@@ -1049,7 +1056,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_GK.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"pred_GK.png")
 plt.close()
 
 #figure detail
@@ -1077,7 +1084,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
 plt.close()
 
 
@@ -1136,7 +1143,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_int.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1165,7 +1172,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
 plt.close()
 
 
@@ -1182,7 +1189,7 @@ info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = co
 info = pd.concat([info,info_ad])
 
 
-info.to_csv(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/info3.txt",index = False)
+info.to_csv(r"/home/kawaguchi/result/seed"+str(seed)+"/info3.txt",index = False)
 
 VACF_temp = []
 D_int_temp = []
@@ -1208,5 +1215,5 @@ for i in GK_int_orbits:
     pass
 
 
-np.savetxt(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/VACF.txt",VACF_temp)
-np.savetxt(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/D_int.txt",D_int_temp)
+np.savetxt(r"/home/kawaguchi/result/seed"+str(seed)+"/VACF.txt",VACF_temp)
+np.savetxt(r"/home/kawaguchi/result/seed"+str(seed)+"/D_int.txt",D_int_temp)

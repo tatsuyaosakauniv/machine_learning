@@ -65,7 +65,7 @@ class FixedOrderFormatter(ScalarFormatter):
 # いつかは出来るようにしたいけど，linuxでのLiberation Sansでの描画はFontがないですって言われる．一応エラー文みたいなのが出るけど問題なく回る．
 # Liberation Sansを使いたくて色々やってたら仮想環境が全部吹き飛んだので諦める．キレそう．
 plt.rcParams['font.family'] = 'Liberation Sans'
-plt.rcParams["mathtext.fontset"]="STIX"
+plt.rcParams["mathtext.fontset"]="stix"
 
 #------------------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ set_seed(1)
 #---   データ読み込み及び必要なパラメータの指定
 
 #フォルダとファイル名指定及びその読み込み
-address = r"/home/kawaguchi/machine_learning/data" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
+address = r"/home/kawaguchi/data" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
 DATA_filename = "flow_check_top_1125.dat" 
 data_name = address + DATA_filename
@@ -604,7 +604,7 @@ dL_list = []
 
 #     pass
 
-# generator.save(r"/home/kawaguchi/machine_learning/model/"+"test_1205"+str(save_count)+".h5")
+# generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
 # gen_array.append(generator)
 # save_count +=1
 
@@ -632,11 +632,14 @@ ax.legend(fontsize = 30)
 
 ax.minorticks_on()
 
+plt.xlim([x.min(), x.max()])
+plt.ylim([y.min(), y.max()])
+
 ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/training_proceed.png")
+plt.savefig(r"/home/kawaguchi/result/training_proceed.png")
 plt.close()
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -652,7 +655,7 @@ gen_array = []
 for i in range(1,2):
 
     #load generator
-    generator = keras.models.load_model(r"/home/kawaguchi/machine_learning/model/"+"test_1205"+str(i)+".h5",compile = False)
+    generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
     gen_array.append(generator)
     pass
 
@@ -763,7 +766,7 @@ print(np.shape(orbits))  # 配列の形状
 print(i)  # インデックスの値
 
 #prediction displacement------------------------
-time_step = np.arange(1,np.shape(orbits[0])[0]+1)
+time_step = np.arange(1, np.shape(orbits[0])[0]+1)
 ax.plot(time_step,orbits[0])
 # ax.plot(time_step,correct_disp[0,0,:],color = "red")
 
@@ -779,7 +782,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/"+Ar_displacement_filename[:-4]+".png")
+plt.savefig(r"/home/kawaguchi/result/"+Ar_displacement_filename[:-4]+".png")
 plt.close()
 
 ########################
@@ -851,7 +854,7 @@ orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_x.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_x.png")
 # plt.close()
 
 # #figure detail
@@ -879,7 +882,7 @@ orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_x.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_x.png")
 # plt.close()
 
 
@@ -909,7 +912,7 @@ orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_y.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_y.png")
 # plt.close()
 
 # #figure detail
@@ -937,7 +940,7 @@ orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_y.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_y.png")
 # plt.close()
 
 
@@ -966,7 +969,7 @@ orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_z.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_z.png")
 # plt.close()
 
 # #figure detail
@@ -994,7 +997,7 @@ orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_z.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_z.png")
 # plt.close()
 
 #figure detail
@@ -1022,7 +1025,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"correct_GK.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"correct_GK.png")
 plt.close()
 
 #figure detail
@@ -1050,7 +1053,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_GK.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"pred_GK.png")
 plt.close()
 
 #figure detail
@@ -1078,7 +1081,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
 plt.close()
 
 
@@ -1130,7 +1133,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_x.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_int_x.png")
 # plt.close()
 
 # fig = plt.figure(figsize = (10,10))
@@ -1156,7 +1159,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_x.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_int_x.png")
 # plt.close()
 
 # #figure detail
@@ -1184,7 +1187,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_y.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_int_y.png")
 # plt.close()
 
 # fig = plt.figure(figsize = (10,10))
@@ -1210,7 +1213,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_y.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_int_y.png")
 # plt.close()
 
 
@@ -1237,7 +1240,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int_z.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_int_z.png")
 # plt.close()
 
 # fig = plt.figure(figsize = (10,10))
@@ -1263,7 +1266,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int_z.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_int_z.png")
 # plt.close()
 
 # fig = plt.figure(figsize = (10,10))
@@ -1290,7 +1293,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_correct_int.png")
+# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_int.png")
 # plt.close()
 
 # fig = plt.figure(figsize = (10,10))
@@ -1317,7 +1320,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_pred_int.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_int.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1346,7 +1349,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
+plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
 plt.close()
 
 
@@ -1363,7 +1366,7 @@ info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = co
 info = pd.concat([info,info_ad])
 
 
-info.to_csv(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/info3.txt",index = False)
+info.to_csv(r"/home/kawaguchi/result/seed"+str(seed)+"/info3.txt",index = False)
 
 VACF_temp = []
 D_int_temp = []
@@ -1389,5 +1392,5 @@ for i in GK_int_orbits:
     pass
 
 
-np.savetxt(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/VACF.txt",VACF_temp)
-np.savetxt(r"/home/kawaguchi/machine_learning/result/seed"+str(seed)+"/D_int.txt",D_int_temp)
+np.savetxt(r"/home/kawaguchi/result/seed"+str(seed)+"/VACF.txt",VACF_temp)
+np.savetxt(r"/home/kawaguchi/result/seed"+str(seed)+"/D_int.txt",D_int_temp)
