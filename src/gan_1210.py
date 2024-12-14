@@ -99,9 +99,6 @@ data_name = address + DATA_filename
 MD_DATA = np.loadtxt(data_name)
 
 
-#!!!parameters
-dt = 1.0 #時間刻み [fs]     #後々pythonで物理量の評価もしたいなら必要
-fs = 1.0E-15
 
 #------------------------------------------------------------------------------------
 
@@ -765,7 +762,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 time_step = np.arange(1,np.shape(flow[0])[0]+1)
 ax.plot(time_step,flow[0])
 
-time_step = np.arange(1,np.shape(correct_disp[0])[0]+1)
+time_step = np.arange(1,correct_disp[0]+1)              # correct_disp は二次元配列であることに注意
 ax.plot(time_step,correct_disp[0],color = "red")
 
 
@@ -787,221 +784,75 @@ plt.close()
 #####  Green-Kubo  #####
 ########################
 
+## よく変更する（いずれ上の方に移動するかも）
+
+dt = 1.0 # 時間刻み [fs]     #後々pythonで物理量の評価もしたいなら必要
+fs = 1.0E-15
+
+timePlot = 10.0E-12 # 相関時間　[ps]
+timeSlide = 0.50E-12 # ずらす時間 [ps]
+timeInterval = 0.01E-12 # プロット時間間隔 [ps]
+
+stpRecord = 10 # 
+
+
+nmsdtime = timePlot / fs / stpRecord
+n_picking = data_step / nmsdtime
+shift_msd = timeSlide / fs / stpRecord
+
 print(np.shape(correct_disp))
 print(np.shape(flow))
 
-correct_GK = np.zeros((nmsdtime))
+
+
 # correct_GK_x = np.zeros((nmsdtime))
 # correct_GK_y = np.zeros((nmsdtime))
 # correct_GK_z = np.zeros((nmsdtime))
 
-orbits_GK = np.zeros((nmsdtime))
 # orbits_GK_x = np.zeros((nmsdtime))
 # orbits_GK_y = np.zeros((nmsdtime))
 # orbits_GK_z = np.zeros((nmsdtime))
 
 
 
-for j in range(n_picking):
-    correct_GK = correct_GK*10**10
-    # correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    # correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    # correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+# for j in range(n_picking):
+#     correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+#     correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+#     correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
 
-    orbits_GK = orbits_GK + np.average(flow[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(flow[:,j*shift_msd][:, np.newaxis],(np.shape(flow[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    # orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    # orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    # orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    pass
+#     orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+#     orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+#     orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+#     pass
 
 ####
 
-time = np.arange(1,nmsdtime+1)*stepskip*dt*10**(-3)
+ACF_true = np.zeros(nmsdtime)
+ACF_pred = np.zeros(nmsdtime)
 
-correct_GK = correct_GK*10**10
+for i in range(n_picking):
+    ACF_true = ACF_true + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    ACF_pred = ACF_pred + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+
+####
+
+
+time = np.arange(1,nmsdtime+1)*dt*10**3
+
+ACF_true = ACF_true*10**10
+ACF_pred = ACF_pred*10**10
+
 # correct_GK_x = correct_GK_x*10**10
 # correct_GK_y = correct_GK_y*10**10
 # correct_GK_z = correct_GK_z*10**10
 
-# correct_GK = (correct_GK_x+correct_GK_y+correct_GK_z)/3
+# ACF_true = (correct_GK_x+correct_GK_y+correct_GK_z)/3
 
-correct_GK = correct_GK*10**10
 # orbits_GK_x = orbits_GK_x*10**10
 # orbits_GK_y = orbits_GK_y*10**10
 # orbits_GK_z = orbits_GK_z*10**10
 
-# orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,correct_GK_x)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_x.png")
-# plt.close()
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,orbits_GK_x)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_x.png")
-# plt.close()
-
-
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,correct_GK_y)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK y [m$^2$/s$^2$]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_y.png")
-# plt.close()
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,orbits_GK_y)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_y.png")
-# plt.close()
-
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,correct_GK_z)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK z [m$^2$/s$^2$]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_correct_z.png")
-# plt.close()
-
-# #figure detail
-
-# fig = plt.figure(figsize = (10,10))
-
-# ax = fig.add_subplot(111)
-
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# #------------------------
-
-# plt.plot(time,orbits_GK_z)
-
-
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
-
-# # plt.legend(fontsize = 30)
-
-# plt.minorticks_on()
-
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
-
-# plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_z.png")
-# plt.close()
+# ACF_pred = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 
 #figure detail
 
@@ -1014,11 +865,11 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
-plt.plot(time,correct_GK,color="red")
+plt.plot(time,ACF_true,color="red")
 
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
+plt.ylabel("HFACF [m$^2$/s$^2$]",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1028,7 +879,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"correct_GK.png")
+plt.savefig(r"/home/kawaguchi/result/ACF_true.png")
 plt.close()
 
 #figure detail
@@ -1042,11 +893,11 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
-plt.plot(time,orbits_GK)
+plt.plot(time,ACF_pred,color='blue')
 
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
+plt.ylabel("HFACF [m$^2$/s$^2$]",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1056,7 +907,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"pred_GK.png")
+plt.savefig(r"/home/kawaguchi/result/ACF_pred.png")
 plt.close()
 
 #figure detail
@@ -1070,11 +921,11 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
-plt.plot(time,orbits_GK,color="blue")
-plt.plot(time,correct_GK,color="red")
+plt.plot(time,ACF_pred,color="blue")
+plt.plot(time,ACF_true,color="red")
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
+plt.ylabel("HFACF [m$^2$/s$^2$]",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1084,37 +935,34 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
+plt.savefig(r"/home/kawaguchi/result/ACF_pred_and_true.png")
 plt.close()
 
 
-GK_int_correct = np.zeros((nmsdtime-1))
+ITR_true = np.zeros(nmsdtime-1)
 # GK_int_correct_x = np.zeros((nmsdtime-1))
 # GK_int_correct_y = np.zeros((nmsdtime-1))
 # GK_int_correct_z = np.zeros((nmsdtime-1))
 
-GK_int_orbits = np.zeros((nmsdtime-1))
+ITR_pred = np.zeros(nmsdtime-1)
 # GK_int_orbits_x = np.zeros((nmsdtime-1))
 # GK_int_orbits_y = np.zeros((nmsdtime-1))
 # GK_int_orbits_z = np.zeros((nmsdtime-1))
 
 for i in range(0,nmsdtime-1-1):
 
-    GK_int_correct[i+1] = GK_int_correct[i] + ((correct_GK[i]+correct_GK[i+1])/2.0)*dt*stepskip*10**(-15)
+    ITR_true[i+1] = ITR_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*dt*10**(-15)
     # GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
 
-    GK_int_orbits[i+1]  = GK_int_orbits[i] + ((orbits_GK[i]+orbits_GK[i+1])/2.0)*dt*stepskip*10**(-15)
+    ITR_pred[i+1] = ITR_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*dt*10**(-15)
     # GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
     pass
 
-# GK_int_correct = (GK_int_correct_x+GK_int_correct_y+GK_int_correct_z)/3
-# GK_int_orbits = (GK_int_orbits_x+GK_int_orbits_y+GK_int_orbits_z)/3
-
-time = np.arange(1,nmsdtime)*stepskip*dt*10**(-3)
+time = np.arange(1,nmsdtime)*dt*10**3
 #figure detail
 
 fig = plt.figure(figsize = (10,10))
@@ -1128,12 +976,12 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # x, y, z は省略
 # #------------------------
 
-ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
-plt.plot(time,GK_int_orbits)
+ax.axvspan(int(0.6*nmsdtime)*dt*10**3,nmsdtime*dt*10**3,color = "coral",alpha = 0.5)
+plt.plot(time,ITR_pred)
 
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.ylabel("ITR [K · m$^2$/W]",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1143,7 +991,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_pred_int.png")
+plt.savefig(r"/home/kawaguchi/result/ITR_pred.png")
 plt.close()
 
 fig = plt.figure(figsize = (10,10))
@@ -1155,14 +1003,14 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
-ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
+ax.axvspan(int(0.6*nmsdtime)*dt*10**3,nmsdtime*dt*10**3,color = "coral",alpha = 0.5)
 
-plt.plot(time,GK_int_orbits,color="blue")
-plt.plot(time,GK_int_correct,color = "red")
+plt.plot(time,ITR_pred,color="blue")
+plt.plot(time,ITR_true,color = "red")
 
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.ylabel("ITR [K · m$^2$/W]",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1172,24 +1020,24 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
+plt.savefig(r"/home/kawaguchi/result/ITR_pred_and_true.png")
 plt.close()
 
 
 
-D_PREDICTED = np.average(GK_int_orbits[int(0.6*nmsdtime):])
+D_PREDICTED = np.average(ITR_pred[int(0.6*nmsdtime):])
 
-info_ad = pd.DataFrame(data=[["D_pred_GK [m$^2$/s]",D_PREDICTED]],columns = columns2)
+info_ad = pd.DataFrame(data=[["D_pred_GK [m$^2$/s]",D_PREDICTED]],columns = columns2)   # これわからん
 info = pd.concat([info,info_ad])
 
 
-D_CORRECT = np.average(GK_int_correct[int(0.6*nmsdtime):])
+D_CORRECT = np.average(ITR_true[int(0.6*nmsdtime):])
 
 info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = columns2)
 info = pd.concat([info,info_ad])
 
 
-info.to_csv(r"/home/kawaguchi/result/seed"+str(seed)+"/info3.txt",index = False)
+info.to_csv(r"/home/kawaguchi/result/info.txt",index = False)
 
 VACF_temp = []
 D_int_temp = []
@@ -1198,22 +1046,22 @@ for i in time:
     D_int_temp.append(i)
     pass
 
-for i in correct_GK:
+for i in ACF_true:
     VACF_temp.append(i)
     pass
 
-for i in orbits_GK:
+for i in ACF_pred:
     VACF_temp.append(i)
     pass
 
-for i in GK_int_correct:
+for i in ITR_true:
     D_int_temp.append(i)
     pass
 
-for i in GK_int_orbits:
+for i in ITR_pred:
     D_int_temp.append(i)
     pass
 
 
-np.savetxt(r"/home/kawaguchi/result/seed"+str(seed)+"/VACF.txt",VACF_temp)
-np.savetxt(r"/home/kawaguchi/result/seed"+str(seed)+"/D_int.txt",D_int_temp)
+np.savetxt(r"/home/kawaguchi/result/VACF.txt",VACF_temp)
+np.savetxt(r"/home/kawaguchi/result/D_int.txt",D_int_temp)

@@ -737,649 +737,649 @@ correct_disp[分子番号,xyz,分子の軌跡]
 """
 
 
-# #学習データに使ったデータのステップ数
-# boundary_for_graph = use_step
+#学習データに使ったデータのステップ数
+boundary_for_graph = use_step
 
-# #図示の際に表示する区間
-# show_step = 3000
+#図示の際に表示する区間
+show_step = 3000
 
-# ########以下，図示用の処理
+########以下，図示用の処理
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #prediction displacement------------------------
-# time_step = np.arange(1,np.shape(orbits[i])[0]+1)
-# ax.plot(time_step,orbits[i])
-# ax.plot(time_step,correct_disp[0,0,:],color = "red")
+#prediction displacement------------------------
+time_step = np.arange(1,np.shape(orbits[i])[0]+1)
+ax.plot(time_step,orbits[i])
+ax.plot(time_step,correct_disp[0,0,:],color = "red")
 
 
-# ax.set_xlabel("step",fontsize = 30)
-# ax.set_ylabel("velocity",fontsize = 30)
+ax.set_xlabel("step",fontsize = 30)
+ax.set_ylabel("velocity",fontsize = 30)
 
-# # ax.legend(fontsize = 30)
+# ax.legend(fontsize = 30)
 
-# ax.minorticks_on()
+ax.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/"+Ar_displacement_filename[:-4]+".png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/"+Ar_displacement_filename[:-4]+".png")
+plt.close()
 
-# ########################
-# #####  Green-Kubo  #####
-# ########################
+########################
+#####  Green-Kubo  #####
+########################
 
-# print(np.shape(correct_disp))
-# print(np.shape(orbits))
+print(np.shape(correct_disp))
+print(np.shape(orbits))
 
 
-# correct_GK_x = np.zeros((nmsdtime))
-# correct_GK_y = np.zeros((nmsdtime))
-# correct_GK_z = np.zeros((nmsdtime))
+correct_GK_x = np.zeros((nmsdtime))
+correct_GK_y = np.zeros((nmsdtime))
+correct_GK_z = np.zeros((nmsdtime))
 
-# orbits_GK_x = np.zeros((nmsdtime))
-# orbits_GK_y = np.zeros((nmsdtime))
-# orbits_GK_z = np.zeros((nmsdtime))
+orbits_GK_x = np.zeros((nmsdtime))
+orbits_GK_y = np.zeros((nmsdtime))
+orbits_GK_z = np.zeros((nmsdtime))
 
 
 
-# for j in range(n_picking):
-#     correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,j*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
-#     correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,1]*np.broadcast_to(correct_disp[:,j*shift_msd,1][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,1]))),axis = 0)/n_picking
-#     correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,2]*np.broadcast_to(correct_disp[:,j*shift_msd,2][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,2]))),axis = 0)/n_picking
+for j in range(n_picking):
+    correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,j*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
+    correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,1]*np.broadcast_to(correct_disp[:,j*shift_msd,1][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,1]))),axis = 0)/n_picking
+    correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,2]*np.broadcast_to(correct_disp[:,j*shift_msd,2][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,2]))),axis = 0)/n_picking
 
-#     orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,j*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
-#     orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,1]*np.broadcast_to(orbits[:,j*shift_msd,1][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,1]))),axis = 0)/n_picking
-#     orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,2]*np.broadcast_to(orbits[:,j*shift_msd,2][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,2]))),axis = 0)/n_picking
-#     pass
+    orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,j*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
+    orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,1]*np.broadcast_to(orbits[:,j*shift_msd,1][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,1]))),axis = 0)/n_picking
+    orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,2]*np.broadcast_to(orbits[:,j*shift_msd,2][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,2]))),axis = 0)/n_picking
+    pass
 
-# ####
+####
 
-# time = np.arange(1,nmsdtime+1)*stepskip*dt*10**(-3)
+time = np.arange(1,nmsdtime+1)*stepskip*dt*10**(-3)
 
-# correct_GK_x = correct_GK_x*10**10
-# correct_GK_y = correct_GK_y*10**10
-# correct_GK_z = correct_GK_z*10**10
+correct_GK_x = correct_GK_x*10**10
+correct_GK_y = correct_GK_y*10**10
+correct_GK_z = correct_GK_z*10**10
 
-# correct_GK = (correct_GK_x+correct_GK_y+correct_GK_z)/3
+correct_GK = (correct_GK_x+correct_GK_y+correct_GK_z)/3
 
-# orbits_GK_x = orbits_GK_x*10**10
-# orbits_GK_y = orbits_GK_y*10**10
-# orbits_GK_z = orbits_GK_z*10**10
+orbits_GK_x = orbits_GK_x*10**10
+orbits_GK_y = orbits_GK_y*10**10
+orbits_GK_z = orbits_GK_z*10**10
 
-# orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
+orbits_GK = (orbits_GK_x+orbits_GK_y+orbits_GK_z)/3
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,correct_GK_x)
+plt.plot(time,correct_GK_x)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_x.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_x.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,orbits_GK_x)
+plt.plot(time,orbits_GK_x)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_x.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_x.png")
+plt.close()
 
 
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,correct_GK_y)
+plt.plot(time,correct_GK_y)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK y [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK y [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_y.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_y.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,orbits_GK_y)
+plt.plot(time,orbits_GK_y)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_y.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_y.png")
+plt.close()
 
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,correct_GK_z)
+plt.plot(time,correct_GK_z)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK z [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK z [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_z.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_z.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,orbits_GK_z)
+plt.plot(time,orbits_GK_z)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK x [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_z.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_z.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,correct_GK,color="red")
+plt.plot(time,correct_GK,color="red")
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"correct_GK.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"correct_GK.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,orbits_GK)
+plt.plot(time,orbits_GK)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"pred_GK.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"pred_GK.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,orbits_GK,color="blue")
-# plt.plot(time,correct_GK,color="red")
+plt.plot(time,orbits_GK,color="blue")
+plt.plot(time,correct_GK,color="red")
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("GK [m$^2$/s$^2$]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"pred_and_correct_GK.png")
+plt.close()
 
 
 
-# GK_int_correct_x = np.zeros((nmsdtime-1))
-# GK_int_correct_y = np.zeros((nmsdtime-1))
-# GK_int_correct_z = np.zeros((nmsdtime-1))
+GK_int_correct_x = np.zeros((nmsdtime-1))
+GK_int_correct_y = np.zeros((nmsdtime-1))
+GK_int_correct_z = np.zeros((nmsdtime-1))
 
-# GK_int_orbits_x = np.zeros((nmsdtime-1))
-# GK_int_orbits_y = np.zeros((nmsdtime-1))
-# GK_int_orbits_z = np.zeros((nmsdtime-1))
+GK_int_orbits_x = np.zeros((nmsdtime-1))
+GK_int_orbits_y = np.zeros((nmsdtime-1))
+GK_int_orbits_z = np.zeros((nmsdtime-1))
 
-# for i in range(0,nmsdtime-1-1):
-#     GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
-#     GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
-#     GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
+for i in range(0,nmsdtime-1-1):
+    GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
+    GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
+    GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
 
-#     GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
-#     GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
-#     GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
-#     pass
+    GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
+    GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
+    GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
+    pass
 
-# GK_int_correct = (GK_int_correct_x+GK_int_correct_y+GK_int_correct_z)/3
-# GK_int_orbits = (GK_int_orbits_x+GK_int_orbits_y+GK_int_orbits_z)/3
+GK_int_correct = (GK_int_correct_x+GK_int_correct_y+GK_int_correct_z)/3
+GK_int_orbits = (GK_int_orbits_x+GK_int_orbits_y+GK_int_orbits_z)/3
 
-# time = np.arange(1,nmsdtime)*stepskip*dt*10**(-3)
-# #figure detail
+time = np.arange(1,nmsdtime)*stepskip*dt*10**(-3)
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,GK_int_correct_x)
+plt.plot(time,GK_int_correct_x)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_x.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_x.png")
+plt.close()
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,GK_int_orbits_x)
+plt.plot(time,GK_int_orbits_x)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_x.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_x.png")
+plt.close()
 
-# #figure detail
+#figure detail
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,GK_int_correct_y)
+plt.plot(time,GK_int_correct_y)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_y.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_y.png")
+plt.close()
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,GK_int_orbits_y)
+plt.plot(time,GK_int_orbits_y)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_y.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_y.png")
+plt.close()
 
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,GK_int_correct_z)
+plt.plot(time,GK_int_correct_z)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_z.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int_z.png")
+plt.close()
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# plt.plot(time,GK_int_orbits_z)
+plt.plot(time,GK_int_orbits_z)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_z.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int_z.png")
+plt.close()
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
-# plt.plot(time,GK_int_correct,color="red")
+ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
+plt.plot(time,GK_int_correct,color="red")
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_correct_int.png")
+plt.close()
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
-# plt.plot(time,GK_int_orbits)
+ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
+plt.plot(time,GK_int_orbits)
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_pred_int.png")
+plt.close()
 
-# fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,10))
 
-# ax = fig.add_subplot(111)
+ax = fig.add_subplot(111)
 
-# ax.yaxis.offsetText.set_fontsize(40)
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# #------------------------
+#------------------------
 
-# ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
+ax.axvspan(int(0.6*nmsdtime)*stepskip*dt*10**(-3),nmsdtime*stepskip*dt*10**(-3),color = "coral",alpha = 0.5)
 
-# plt.plot(time,GK_int_orbits,color="blue")
-# plt.plot(time,GK_int_correct,color = "red")
+plt.plot(time,GK_int_orbits,color="blue")
+plt.plot(time,GK_int_correct,color = "red")
 
 
-# plt.xlabel("time [ps]",fontsize = 30)
-# plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("D$_{VACF}$ [m$^2$/s]",fontsize = 30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
-# plt.close()
+plt.savefig(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/"+"GK_int_pred_and_correct.png")
+plt.close()
 
 
 
-# D_PREDICTED = np.average(GK_int_orbits[int(0.6*nmsdtime):])
+D_PREDICTED = np.average(GK_int_orbits[int(0.6*nmsdtime):])
 
-# info_ad = pd.DataFrame(data=[["D_pred_GK [m$^2$/s]",D_PREDICTED]],columns = columns2)
-# info = pd.concat([info,info_ad])
+info_ad = pd.DataFrame(data=[["D_pred_GK [m$^2$/s]",D_PREDICTED]],columns = columns2)
+info = pd.concat([info,info_ad])
 
 
-# D_CORRECT = np.average(GK_int_correct[int(0.6*nmsdtime):])
+D_CORRECT = np.average(GK_int_correct[int(0.6*nmsdtime):])
 
-# info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = columns2)
-# info = pd.concat([info,info_ad])
+info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = columns2)
+info = pd.concat([info,info_ad])
 
 
-# info.to_csv(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/info3.txt",index = False)
+info.to_csv(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/info3.txt",index = False)
 
-# VACF_temp = []
-# D_int_temp = []
-# for i in time:
-#     VACF_temp.append(i)
-#     D_int_temp.append(i)
-#     pass
+VACF_temp = []
+D_int_temp = []
+for i in time:
+    VACF_temp.append(i)
+    D_int_temp.append(i)
+    pass
 
-# for i in correct_GK:
-#     VACF_temp.append(i)
-#     pass
+for i in correct_GK:
+    VACF_temp.append(i)
+    pass
 
-# for i in orbits_GK:
-#     VACF_temp.append(i)
-#     pass
+for i in orbits_GK:
+    VACF_temp.append(i)
+    pass
 
-# for i in GK_int_correct:
-#     D_int_temp.append(i)
-#     pass
+for i in GK_int_correct:
+    D_int_temp.append(i)
+    pass
 
-# for i in GK_int_orbits:
-#     D_int_temp.append(i)
-#     pass
+for i in GK_int_orbits:
+    D_int_temp.append(i)
+    pass
 
 
-# np.savetxt(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/VACF.txt",VACF_temp)
-# np.savetxt(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/D_int.txt",D_int_temp)
+np.savetxt(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/VACF.txt",VACF_temp)
+np.savetxt(r"/home/s_tanaka/MD-GAN/test/seed"+str(seed)+"/D_int.txt",D_int_temp)
