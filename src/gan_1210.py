@@ -117,11 +117,12 @@ info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 point_mol_num = 1
+dim = 1
 
 ###予測データとの比較用にMDデータの処理
-correct_disp = np.zeros(shape =(point_mol_num,data_step))
+correct_disp = np.zeros(shape =(point_mol_num, data_step, dim))
 
-correct_disp[0, :] = np.array(MD_DATA[:data_step, 1])
+correct_disp[0, :, 0] = np.array(MD_DATA[:data_step, 1])
 
 #予測データとの比較用のMDデータ成形（つまり，test data）-----------
 print("MD_DATA shape: ",np.shape(MD_DATA))
@@ -706,18 +707,18 @@ for j in range(data_num):
     pass
 
 #一つのモデルから得られるトラジェクトリ数をリストに収める．
-flow = orbit_per_onemol
+orbits = orbit_per_onemol
 
 #-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#
 
 
-flow = np.array(flow)
+orbits = np.array(orbits)
 
-print("flow", np.shape(flow))
+print("flow", np.shape(orbits))
 print(np.shape(data_of_MD))
 
 #domain knowledge による補正
-flow[:,:,0] = flow[:,:,0]*STD_DATA+ AVERAGE_DATA
+orbits[:,:,0] = orbits[:,:,0]*STD_DATA+ AVERAGE_DATA
 
 ####################################
 """
@@ -759,10 +760,10 @@ ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #prediction displacement------------------------
-time_step = np.arange(1,np.shape(flow[0])[0]+1)
-ax.plot(time_step,flow[0])
+time_step = np.arange(1,np.shape(orbits[0])[0]+1)
+ax.plot(time_step,orbits[0])
 
-time_step = np.arange(1,correct_disp[0]+1)              # correct_disp は二次元配列であることに注意
+time_step = np.arange(1, len(correct_disp[0,:,0])+1)              # correct_disp は二次元配列であることに注意
 ax.plot(time_step,correct_disp[0],color = "red")
 
 
@@ -796,12 +797,16 @@ timeInterval = 0.01E-12 # プロット時間間隔 [ps]
 stpRecord = 10 # 
 
 
-nmsdtime = timePlot / fs / stpRecord
-n_picking = data_step / nmsdtime
-shift_msd = timeSlide / fs / stpRecord
+nmsdtime = int(timePlot / fs / stpRecord)+1
+n_picking = int(data_step / nmsdtime)
+shift_msd = int(timeSlide / fs / stpRecord)+1
+
+print(nmsdtime)
+print(n_picking)
+print(shift_msd)
 
 print(np.shape(correct_disp))
-print(np.shape(flow))
+print(np.shape(orbits))
 
 
 
@@ -831,8 +836,8 @@ ACF_true = np.zeros(nmsdtime)
 ACF_pred = np.zeros(nmsdtime)
 
 for i in range(n_picking):
-    ACF_true = ACF_true + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-    ACF_pred = ACF_pred + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
+    ACF_true = ACF_true + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,j*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
+    ACF_pred = ACF_pred + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,j*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
 
 ####
 
@@ -869,7 +874,8 @@ plt.plot(time,ACF_true,color="red")
 
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("HFACF [m$^2$/s$^2$]",fontsize = 30)
+plt.ylabel("HFACF [W/m$^2$",fontsize = 30)
+
 
 # plt.legend(fontsize = 30)
 
@@ -897,7 +903,8 @@ plt.plot(time,ACF_pred,color='blue')
 
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("HFACF [m$^2$/s$^2$]",fontsize = 30)
+plt.ylabel("HFACF [W/m$^2$",fontsize = 30)
+
 
 # plt.legend(fontsize = 30)
 
@@ -925,7 +932,7 @@ plt.plot(time,ACF_pred,color="blue")
 plt.plot(time,ACF_true,color="red")
 
 plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("HFACF [m$^2$/s$^2$]",fontsize = 30)
+plt.ylabel("HFACF [W/m$^2$",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
