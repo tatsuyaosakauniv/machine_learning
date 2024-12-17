@@ -91,9 +91,9 @@ set_seed(1)
 #---   データ読み込み及び必要なパラメータの指定
 
 #フォルダとファイル名指定及びその読み込み
-address = r"/home/kawaguchi/data" + "/"               #r"[ファイルが入ってるフォルダー名]"+"/"
+address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "flow_check_top_1211.dat" 
+DATA_filename = "flow_check_top_1216.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
@@ -134,7 +134,7 @@ data_of_MD[0, :, 0] = np.array(MD_DATA[:data_step, 1])     # 熱流束
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
-DATA_filename = "flow_check_top_1211.dat"                   #学習用ファイル
+DATA_filename = "flow_check_top_1216.dat"                   #学習用ファイル
 data_name = address + DATA_filename
 
 TRAIN_DATA = np.loadtxt(data_name)
@@ -658,7 +658,7 @@ for i in range(1,2):
     gen_array.append(generator)
     pass
 
-print("gen_array :",len(gen_array))
+print("gen_array:",len(gen_array))
 
 #######################################################################################
 ############################    予測フェーズ開始  ####################################
@@ -714,8 +714,8 @@ orbits = orbit_per_onemol
 
 orbits = np.array(orbits)
 
-print("flow", np.shape(orbits))
-print(np.shape(data_of_MD))
+print("orbits: ", np.shape(orbits))
+print("data_of_MD: ", np.shape(data_of_MD))
 
 #domain knowledge による補正
 orbits[:,:,0] = orbits[:,:,0]*STD_DATA+ AVERAGE_DATA
@@ -801,12 +801,12 @@ nmsdtime = int(timePlot / fs / stpRecord)+1
 n_picking = int(data_step / nmsdtime)
 shift_msd = int(timeSlide / fs / stpRecord)+1
 
-print(nmsdtime)
-print(n_picking)
-print(shift_msd)
+print("nmsdtime: ", nmsdtime)
+print("n_picking: ", n_picking)
+print("shift_msd: ", shift_msd)
 
-print(np.shape(correct_disp))
-print(np.shape(orbits))
+print("correct_disp: ", np.shape(correct_disp))
+print("orbits: ", np.shape(orbits))
 
 
 
@@ -832,8 +832,8 @@ print(np.shape(orbits))
 
 ####
 
-ACF_true = np.zeros(nmsdtime)
-ACF_pred = np.zeros(nmsdtime)
+ACF_true = np.zeros((nmsdtime,))
+ACF_pred = np.zeros((nmsdtime,))
 
 for i in range(n_picking):
     ACF_true = ACF_true + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,j*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
@@ -946,12 +946,12 @@ plt.savefig(r"/home/kawaguchi/result/ACF_pred_and_true.png")
 plt.close()
 
 
-ITR_true = np.zeros(nmsdtime-1)
+ITR_true = np.zeros((nmsdtime-1,))
 # GK_int_correct_x = np.zeros((nmsdtime-1))
 # GK_int_correct_y = np.zeros((nmsdtime-1))
 # GK_int_correct_z = np.zeros((nmsdtime-1))
 
-ITR_pred = np.zeros(nmsdtime-1)
+ITR_pred = np.zeros((nmsdtime-1,))
 # GK_int_orbits_x = np.zeros((nmsdtime-1))
 # GK_int_orbits_y = np.zeros((nmsdtime-1))
 # GK_int_orbits_z = np.zeros((nmsdtime-1))
