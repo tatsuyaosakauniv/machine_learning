@@ -789,21 +789,22 @@ plt.close()
 
 dt = 1.0 # 時間刻み [fs]     #後々pythonで物理量の評価もしたいなら必要
 fs = 1.0E-15
+ps = 1.0E-12
 
-timePlot = 10.0E-12 # 相関時間　[ps]
-timeSlide = 0.50E-12 # ずらす時間 [ps]
-timeInterval = 0.01E-12 # プロット時間間隔 [ps]
+timePlot = 10.0 # 相関時間　[ps]
+timeSlide = 0.50 # ずらす時間 [ps]
+timeInterval = 0.01 # プロット時間間隔 [ps]
 
 stpRecord = 10 # 
 
 
-nmsdtime = int(timePlot / fs / stpRecord)+1
-n_picking = int(data_step / nmsdtime)
-shift_msd = int(timeSlide / fs / stpRecord)+1
+nmsdtime = int(timePlot*ps / fs / stpRecord)+1
+n_picking = int(data_step / nmsdtime) # <-----------------------もしかして要らない？
+shift_msd = int(timeSlide*ps / fs / stpRecord)+1
 
-print("nmsdtime: ", nmsdtime)
-print("n_picking: ", n_picking)
-print("shift_msd: ", shift_msd)
+print("nmsdtime: ", nmsdtime)       # 1000 行   熱流束の時刻を 0 にリセットする間隔
+print("n_picking: ", n_picking)     # 100 行    矢印の個数　だと思ってたけど違うかも
+print("shift_msd: ", shift_msd)     # 50 行     計算のスタートをずらす間隔
 
 print("correct_disp: ", np.shape(correct_disp))
 print("orbits: ", np.shape(orbits))
@@ -836,15 +837,15 @@ ACF_true = np.zeros((nmsdtime,))
 ACF_pred = np.zeros((nmsdtime,))
 
 for i in range(n_picking):
-    ACF_true = ACF_true + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,j*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
-    ACF_pred = ACF_pred + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,j*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
+    ACF_true = ACF_true + np.average(correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,i*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
+    ACF_pred = ACF_pred + np.average(orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,i*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]))),axis = 0)/n_picking
 
 ####
 
 
 time = np.arange(1,nmsdtime+1)*dt*10**3
 
-ACF_true = ACF_true*10**10
+ACF_true = ACF_true*10**10     # これなに？
 ACF_pred = ACF_pred*10**10
 
 # correct_GK_x = correct_GK_x*10**10
@@ -958,12 +959,12 @@ ITR_pred = np.zeros((nmsdtime-1,))
 
 for i in range(0,nmsdtime-1-1):
 
-    ITR_true[i+1] = ITR_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*dt*10**(-15)
+    ITR_true[i+1] = ITR_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*dt*fs
     # GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
 
-    ITR_pred[i+1] = ITR_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*dt*10**(-15)
+    ITR_pred[i+1] = ITR_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*dt*fs
     # GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
