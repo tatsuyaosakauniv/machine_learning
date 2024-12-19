@@ -301,17 +301,17 @@ def normalize_latent(latent):
 
 #-- input
 noise_inputs = tf.keras.Input(shape = (sequence_length, dim)) # ガウスノイズ
-c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
+c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
 flat_noise_g = tf.keras.layers.Flatten()(c_noise)
-innx = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(flat_noise_g)
+innx = tf.keras.layers.Dense(units = sequence_length,activation = "tanh",kernel_initializer = "he_normal")(flat_noise_g)
 # mapping
-nxout = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(innx)
+nxout = tf.keras.layers.Dense(units = sequence_length,activation = "tanh",kernel_initializer = "he_normal")(innx)
 nx = tf.keras.layers.Concatenate(axis=1)([innx,nxout])
 
 #-- hidden layers
-x1 = tf.keras.layers.Dense(2048, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(nx)
-x2 = tf.keras.layers.Dense(2048, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x1)
-x3 = tf.keras.layers.Dense(2048, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x2)
+x1 = tf.keras.layers.Dense(2048, activation = "tanh",kernel_initializer = "he_normal")(nx)
+x2 = tf.keras.layers.Dense(2048, activation = "tanh",kernel_initializer = "he_normal")(x1)
+x3 = tf.keras.layers.Dense(2048, activation = "tanh",kernel_initializer = "he_normal")(x2)
 
 #-- output
 decoded = tf.keras.layers.Dense(units = sequence_length*dim)(x3)
@@ -328,27 +328,27 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
 #
-dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat2 = layers.Flatten()(dc2)
 
 #
-# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 # flat3 = layers.Flatten()(dc3)
 
 # #
-# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 # flat4 = layers.Flatten()(dc4)
 
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
 #
-dd1 = layers.Dense(units = 2048,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
-dd2 = layers.Dense(units = 2048,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
-dd3 = layers.Dense(units = 2048,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
+dd1 = layers.Dense(units = 2048,activation = "tanh",kernel_initializer = "he_normal")(concat_layer_disc)
+dd2 = layers.Dense(units = 2048,activation = "tanh",kernel_initializer = "he_normal")(dd1)
+dd3 = layers.Dense(units = 2048,activation = "tanh",kernel_initializer = "he_normal")(dd2)
 
 #-- output
 disc_out = layers.Dense(1)(dd3)
@@ -997,7 +997,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # x, y, z は省略
 # #------------------------
 
-ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 plt.plot(time,ITR_pred)
 
 
@@ -1024,7 +1024,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
-ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
 plt.plot(time,ITR_pred,color="blue")
 plt.plot(time,ITR_true,color = "red")
@@ -1059,6 +1059,7 @@ info = pd.concat([info,info_ad])
 
 
 info.to_csv(r"/home/kawaguchi/result/info.txt",index = False)
+
 
 VACF_temp = []
 D_int_temp = []
