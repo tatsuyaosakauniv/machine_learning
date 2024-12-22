@@ -172,7 +172,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length =500
+sequence_length = 1000
 batch_size = int(use_step/sequence_length)
 
 
@@ -225,6 +225,7 @@ stds2 = 1.0
 
 dim = 1
 
+hidden_node = 128
 
 discriminator_extra_steps = 5
 gen_lr = 0.000002
@@ -309,9 +310,9 @@ nxout = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.laye
 nx = tf.keras.layers.Concatenate(axis=1)([innx,nxout])
 
 #-- hidden layers
-x1 = tf.keras.layers.Dense(2048, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(nx)
-x2 = tf.keras.layers.Dense(2048, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x1)
-x3 = tf.keras.layers.Dense(2048, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x2)
+x1 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(nx)
+x2 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x1)
+x3 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x2)
 
 #-- output
 decoded = tf.keras.layers.Dense(units = sequence_length*dim)(x3)
@@ -328,7 +329,7 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
@@ -346,9 +347,9 @@ flat2 = layers.Flatten()(dc2)
 
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
 #
-dd1 = layers.Dense(units = 2048,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
-dd2 = layers.Dense(units = 2048,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
-dd3 = layers.Dense(units = 2048,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
+dd1 = layers.Dense(units = hidden_node,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
+dd2 = layers.Dense(units = hidden_node,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
+dd3 = layers.Dense(units = hidden_node,activation = layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
 
 #-- output
 disc_out = layers.Dense(1)(dd3)

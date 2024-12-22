@@ -172,7 +172,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length =500
+sequence_length = 1000
 batch_size = int(use_step/sequence_length)
 
 
@@ -225,6 +225,7 @@ stds2 = 1.0
 
 dim = 1
 
+hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
 gen_lr = 0.000002
@@ -309,9 +310,9 @@ nxout = tf.keras.layers.Dense(units = sequence_length,activation = "tanh",kernel
 nx = tf.keras.layers.Concatenate(axis=1)([innx,nxout])
 
 #-- hidden layers
-x1 = tf.keras.layers.Dense(2048, activation = "tanh",kernel_initializer = "he_normal")(nx)
-x2 = tf.keras.layers.Dense(2048, activation = "tanh",kernel_initializer = "he_normal")(x1)
-x3 = tf.keras.layers.Dense(2048, activation = "tanh",kernel_initializer = "he_normal")(x2)
+x1 = tf.keras.layers.Dense(hidden_node, activation = "tanh",kernel_initializer = "he_normal")(nx)
+x2 = tf.keras.layers.Dense(hidden_node, activation = "tanh",kernel_initializer = "he_normal")(x1)
+x3 = tf.keras.layers.Dense(hidden_node, activation = "tanh",kernel_initializer = "he_normal")(x2)
 
 #-- output
 decoded = tf.keras.layers.Dense(units = sequence_length*dim)(x3)
@@ -328,7 +329,7 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
@@ -346,9 +347,9 @@ flat2 = layers.Flatten()(dc2)
 
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
 #
-dd1 = layers.Dense(units = 2048,activation = "tanh",kernel_initializer = "he_normal")(concat_layer_disc)
-dd2 = layers.Dense(units = 2048,activation = "tanh",kernel_initializer = "he_normal")(dd1)
-dd3 = layers.Dense(units = 2048,activation = "tanh",kernel_initializer = "he_normal")(dd2)
+dd1 = layers.Dense(units = hidden_node,activation = "tanh",kernel_initializer = "he_normal")(concat_layer_disc)
+dd2 = layers.Dense(units = hidden_node,activation = "tanh",kernel_initializer = "he_normal")(dd1)
+dd3 = layers.Dense(units = hidden_node,activation = "tanh",kernel_initializer = "he_normal")(dd2)
 
 #-- output
 disc_out = layers.Dense(1)(dd3)
@@ -690,8 +691,10 @@ reconstruction_ini = tf.reshape(reconstruction_ini,[prediction_times, sequence_l
 
 orbit_per_onemol = reconstruction_ini
 
+print("noise_inputer: ", np.shape(noise_inputer))
+print("reconstruction_ini: ", np.shape(reconstruction_ini))
 
-for j in range(data_num):
+for j in range(data_num-1):     # ここのrangeを1減らして、予測を元データと同じ長さにした
 
     #サンプリング生成
     #ノイズ入力準備####################################
@@ -761,7 +764,30 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #prediction displacement------------------------
 time_step = np.arange(1,np.shape(orbits[0])[0]+1)
-ax.plot(time_step,orbits[0])
+ax.plot(time_step,orbits[0], color="blue")
+
+ax.set_xlabel("step",fontsize = 30)
+ax.set_ylabel("heatflux",fontsize = 30)
+
+# ax.legend(fontsize = 30)
+
+ax.minorticks_on()
+
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+# plt.show()
+
+plt.savefig(r"/home/kawaguchi/result/heatflux_pred.png")
+plt.close()
+
+fig = plt.figure(figsize = (10,10))
+
+ax = fig.add_subplot(111)
+
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+#prediction displacement------------------------
 
 time_step = np.arange(1, len(correct_disp[0,:,0])+1)              # correct_disp は二次元配列であることに注意
 ax.plot(time_step,correct_disp[0],color = "red")
@@ -776,10 +802,62 @@ ax.minorticks_on()
 
 ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
-plt.show()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/heatflux.png")
+plt.savefig(r"/home/kawaguchi/result/heatflux_true.png")
 plt.close()
+
+# 10ps間のみの熱流束の画像も作成
+
+x_ranges = [(1, 1000), (1001, 2000), (2001, 3000)]  # List of x-axis ranges
+
+for x_min, x_max in x_ranges:
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+    
+    ax.yaxis.offsetText.set_fontsize(40)
+    ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+    # Plot prediction displacement
+    ax.plot(time_step, orbits[0], color="blue")
+
+    ax.set_xlabel("step", fontsize=30)
+    ax.set_ylabel("heatflux", fontsize=30)
+    
+    # Set x-axis range
+    ax.set_xlim(x_min, x_max)
+
+    ax.minorticks_on()
+    ax.tick_params(labelsize=30, which="both", direction="in")
+
+    # Save the restricted range plot
+    plt.tight_layout()
+    plt.savefig(f"/home/kawaguchi/result/heatflux_pred_{x_min}_{x_max}.png")
+    plt.close()
+
+for x_min, x_max in x_ranges:
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+
+    ax.yaxis.offsetText.set_fontsize(40)
+    ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+    # Plot correct displacement
+    ax.plot(time_step, correct_disp[0], color="red")
+
+    ax.set_xlabel("step", fontsize=30)
+    ax.set_ylabel("heatflux", fontsize=30)
+
+    # Set x-axis range
+    ax.set_xlim(x_min, x_max)
+
+    ax.minorticks_on()
+    ax.tick_params(labelsize=30, which="both", direction="in")
+
+    # Save the restricted range plot
+    plt.tight_layout()
+    plt.savefig(f"/home/kawaguchi/result/heatflux_true_{x_min}_{x_max}.png")
+    plt.close()  
 
 ########################
 #####  Green-Kubo  #####
