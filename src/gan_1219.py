@@ -1082,7 +1082,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # #------------------------
 
 # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-plt.plot(time,ITR_pred)
+plt.plot(time,ITR_pred,color="blue")
 
 
 plt.xlabel("time [ps]",fontsize = 30)
@@ -1105,6 +1105,27 @@ ax = fig.add_subplot(111)
 
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+#------------------------
+
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+plt.plot(time,ITR_true,color="red")
+
+
+plt.xlabel("time [ps]",fontsize = 30)
+plt.ylabel("ITR [K · m$^2$/W]",fontsize = 30)
+
+# plt.legend(fontsize = 30)
+
+plt.minorticks_on()
+
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
+
+plt.savefig(r"/home/kawaguchi/result/ITR_true.png")
+plt.close()
 
 #------------------------
 
