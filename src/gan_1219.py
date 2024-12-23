@@ -106,8 +106,8 @@ MD_DATA = np.loadtxt(data_name)
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 100000 #MDのサンプルから取り出してくるデータ長
-use_step = 30000   #学習に使うデータ長
+data_step = 1000000 #MDのサンプルから取り出してくるデータ長
+use_step = 300000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -302,17 +302,17 @@ def normalize_latent(latent):
 
 #-- input
 noise_inputs = tf.keras.Input(shape = (sequence_length, dim)) # ガウスノイズ
-c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
+c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
 flat_noise_g = tf.keras.layers.Flatten()(c_noise)
-innx = tf.keras.layers.Dense(units = sequence_length,activation = "tanh",kernel_initializer = "he_normal")(flat_noise_g)
+innx = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(flat_noise_g)
 # mapping
-nxout = tf.keras.layers.Dense(units = sequence_length,activation = "tanh",kernel_initializer = "he_normal")(innx)
+nxout = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(innx)
 nx = tf.keras.layers.Concatenate(axis=1)([innx,nxout])
 
 #-- hidden layers
-x1 = tf.keras.layers.Dense(hidden_node, activation = "tanh",kernel_initializer = "he_normal")(nx)
-x2 = tf.keras.layers.Dense(hidden_node, activation = "tanh",kernel_initializer = "he_normal")(x1)
-x3 = tf.keras.layers.Dense(hidden_node, activation = "tanh",kernel_initializer = "he_normal")(x2)
+x1 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(nx)
+x2 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x1)
+x3 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x2)
 
 #-- output
 decoded = tf.keras.layers.Dense(units = sequence_length*dim)(x3)
@@ -329,27 +329,27 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
 #
-dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat2 = layers.Flatten()(dc2)
 
 #
-# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 # flat3 = layers.Flatten()(dc3)
 
 # #
-# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = "tanh",kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 # flat4 = layers.Flatten()(dc4)
 
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
 #
-dd1 = layers.Dense(units = hidden_node,activation = "tanh",kernel_initializer = "he_normal")(concat_layer_disc)
-dd2 = layers.Dense(units = hidden_node,activation = "tanh",kernel_initializer = "he_normal")(dd1)
-dd3 = layers.Dense(units = hidden_node,activation = "tanh",kernel_initializer = "he_normal")(dd2)
+dd1 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
+dd2 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
+dd3 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
 
 #-- output
 disc_out = layers.Dense(1)(dd3)
@@ -877,8 +877,8 @@ stpRecord = 10 #
 
 
 nmsdtime = int(timePlot*ps / fs / stpRecord)+1
-n_picking = int(data_step / nmsdtime) # <-----------------------もしかして要らない？
 shift_msd = int(timeSlide*ps / fs / stpRecord)+1
+n_picking = int(data_step / shift_msd) # <-----------------------もしかして要らない？
 
 print("nmsdtime: ", nmsdtime)       # 1000 行   熱流束の時刻を 0 にリセットする間隔
 print("n_picking: ", n_picking)     # 100 行    矢印の個数　だと思ってたけど違うかも
@@ -887,45 +887,27 @@ print("shift_msd: ", shift_msd)     # 50 行     計算のスタートをずら�
 print("correct_disp: ", np.shape(correct_disp))
 print("orbits: ", np.shape(orbits))
 
-
-
-# correct_GK_x = np.zeros((nmsdtime))
-# correct_GK_y = np.zeros((nmsdtime))
-# correct_GK_z = np.zeros((nmsdtime))
-
-# orbits_GK_x = np.zeros((nmsdtime))
-# orbits_GK_y = np.zeros((nmsdtime))
-# orbits_GK_z = np.zeros((nmsdtime))
-
-
-
-# for j in range(n_picking):
-#     correct_GK_x = correct_GK_x + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-#     correct_GK_y = correct_GK_y + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-#     correct_GK_z = correct_GK_z + np.average(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(correct_disp[:,j*shift_msd][:, np.newaxis],(np.shape(correct_disp[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-
-#     orbits_GK_x = orbits_GK_x + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-#     orbits_GK_y = orbits_GK_y + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-#     orbits_GK_z = orbits_GK_z + np.average(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]*np.broadcast_to(orbits[:,j*shift_msd][:, np.newaxis],(np.shape(orbits[:,j*shift_msd:j*shift_msd+nmsdtime]))),axis = 0)/n_picking
-#     pass
-
 ####
 
-ACF_true = np.zeros((nmsdtime,))
-ACF_pred = np.zeros((nmsdtime,))
+ACF_true = np.zeros((nmsdtime))
+ACF_pred = np.zeros((nmsdtime))
 
 for i in range(n_picking):
     ACF_true += (correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]*
-                 np.broadcast_to(correct_disp[:,i*shift_msd,0][:, np.newaxis],
-                                 correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape)
-                                ).sum(axis=0) / n_picking
+                 np.broadcast_to(
+                                 correct_disp[:,i*shift_msd,0][:, np.newaxis],
+                                 correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape
+                                )
+                            ).sum(axis=0) / n_picking
+    
     ACF_pred += (orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]*
-                 np.broadcast_to(orbits[:,i*shift_msd,0][:, np.newaxis],
-                                 orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape)
-                                ).sum(axis=0) / n_picking
+                 np.broadcast_to(
+                                 orbits[:,i*shift_msd,0][:, np.newaxis],
+                                 orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape
+                                )
+                            ).sum(axis=0) / n_picking
 
 ####
-
 
 time = np.arange(1,nmsdtime+1)*dt*10**(-3)*stpRecord
 

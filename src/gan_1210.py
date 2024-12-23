@@ -329,20 +329,20 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
 #
-dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat2 = layers.Flatten()(dc2)
 
 #
-# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 # flat3 = layers.Flatten()(dc3)
 
 # #
-# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 # flat4 = layers.Flatten()(dc4)
 
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
@@ -838,10 +838,17 @@ ACF_true = np.zeros((nmsdtime,))
 ACF_pred = np.zeros((nmsdtime,))
 
 for i in range(n_picking):
-    ACF_true = ACF_true + np.average(correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]*np.broadcast_to(correct_disp[:,i*shift_msd,0][:, np.newaxis],(np.shape(correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]))),axis = 0) #/n_picking
-    ACF_pred = ACF_pred + np.average(orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]*np.broadcast_to(orbits[:,i*shift_msd,0][:, np.newaxis],(np.shape(orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]))),axis = 0) #/n_picking
+    ACF_true += (correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]*
+                 np.broadcast_to(correct_disp[:,i*shift_msd,0][:, np.newaxis],
+                                 correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape)
+                                ).sum(axis=0) / n_picking
+    ACF_pred += (orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]*
+                 np.broadcast_to(orbits[:,i*shift_msd,0][:, np.newaxis],
+                                 orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape)
+                                ).sum(axis=0) / n_picking
 
 ####
+
 
 
 time = np.arange(1,nmsdtime+1)*dt*10**(-3)*stpRecord
