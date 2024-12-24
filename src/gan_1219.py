@@ -625,8 +625,8 @@ ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #plot
-ax.plot(iteration_list,dL_list,color = "red",label  = "discriminator Loss")
-ax.plot(iteration_list,gL_list,color = "green",label  = "latent generator Loss")
+# ax.plot(iteration_list,dL_list,color = "red",label  = "discriminator Loss")
+# ax.plot(iteration_list,gL_list,color = "green",label  = "latent generator Loss")
 
 ax.set_xlabel("iteration",fontsize = 30)
 ax.set_ylabel("Loss",fontsize = 30)
@@ -762,44 +762,49 @@ ax = fig.add_subplot(111)
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#prediction displacement------------------------
-time_step = np.arange(1,np.shape(orbits[0])[0]+1)
-ax.plot(time_step,orbits[0], color="blue")
+# Prediction displacement
+time_step = np.arange(1, np.shape(orbits[0])[0] + 1)
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
 
-ax.set_xlabel("step",fontsize = 30)
-ax.set_ylabel("heatflux",fontsize = 30)
+ax.plot(time_step_scaled, orbits[0], color="blue")
 
-# ax.legend(fontsize = 30)
+ax.set_xlabel("Time ns", fontsize=30)
+ax.set_ylabel("Heat Flux W/m$^2$", fontsize=30)
+
+# x軸とy軸の範囲設定
+ax.set_xlim(0, 10)  # x軸を0～10に設定
+ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
 
 ax.minorticks_on()
-
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
+ax.tick_params(labelsize=30, which="both", direction="in")
 plt.tight_layout()
-# plt.show()
 
+# 保存
 plt.savefig(r"/home/kawaguchi/result/heatflux_pred.png")
 plt.close()
 
-fig = plt.figure(figsize = (10,10))
-
+fig = plt.figure(figsize=(10, 10))
 ax = fig.add_subplot(111)
 
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#prediction displacement------------------------
+#prediction displacement
+time_step = np.arange(1, np.shape(orbits[0])[0] + 1)
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
 
-time_step = np.arange(1, len(correct_disp[0,:,0])+1)              # correct_disp は二次元配列であることに注意
-ax.plot(time_step,correct_disp[0],color = "red")
+ax.plot(time_step_scaled, correct_disp[0],color = "red")
 
 
-ax.set_xlabel("step",fontsize = 30)
-ax.set_ylabel("heatflux",fontsize = 30)
+ax.set_xlabel("Time ns",fontsize = 30)
+ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
+
+ax.set_xlim(0, 10)  # x軸を0～10に設定
+ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
 
 # ax.legend(fontsize = 30)
 
 ax.minorticks_on()
-
 ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 # plt.show()
@@ -809,7 +814,21 @@ plt.close()
 
 # 10ps間のみの熱流束の画像も作成
 
-x_ranges = [(1, 1000), (1001, 2000), (2001, 3000)]  # List of x-axis ranges
+# 全データの長さ
+total_steps = np.shape(orbits[0])[0]
+
+# 最初の1/1000のデータ範囲を計算
+end_index = total_steps // 1000  # 配列長の1/1000
+
+# スライスしたタイムステップと対応するデータ
+time_step = np.arange(1, total_steps + 1)[:end_index] / 1000
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+
+# データもスライス（例: orbits, correct_dispなど）
+orbits_sliced = orbits[0, :end_index]  # orbits の最初の1/1000を取得
+correct_disp_sliced = correct_disp[0, :end_index]  # correct_dispも同様x_ranges = [(0, 10)]  # List of x-axis ranges
+
+x_ranges = [(0, 10)]
 
 for x_min, x_max in x_ranges:
     fig = plt.figure(figsize=(10, 10))
@@ -819,13 +838,14 @@ for x_min, x_max in x_ranges:
     ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
     # Plot prediction displacement
-    ax.plot(time_step, orbits[0], color="blue")
+    ax.plot(time_step_scaled, orbits_sliced, color="blue")
 
-    ax.set_xlabel("step", fontsize=30)
-    ax.set_ylabel("heatflux", fontsize=30)
+    ax.set_xlabel("Time ps", fontsize=30)
+    ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
     
     # Set x-axis range
     ax.set_xlim(x_min, x_max)
+    ax.set_ylim(-1.6e10, 1.6e10)
 
     ax.minorticks_on()
     ax.tick_params(labelsize=30, which="both", direction="in")
@@ -843,13 +863,14 @@ for x_min, x_max in x_ranges:
     ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
     # Plot correct displacement
-    ax.plot(time_step, correct_disp[0], color="red")
+    ax.plot(time_step_scaled, correct_disp_sliced, color="red")
 
-    ax.set_xlabel("step", fontsize=30)
-    ax.set_ylabel("heatflux", fontsize=30)
+    ax.set_xlabel("Time ps", fontsize=30)
+    ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
 
     # Set x-axis range
-    ax.set_xlim(x_min, x_max)
+    ax.set_xlim(x_min, x_max)  
+    ax.set_ylim(-1.6e10, 1.6e10)
 
     ax.minorticks_on()
     ax.tick_params(labelsize=30, which="both", direction="in")
@@ -893,19 +914,31 @@ ACF_true = np.zeros((nmsdtime))
 ACF_pred = np.zeros((nmsdtime))
 
 for i in range(n_picking):
-    ACF_true += (correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0]*
-                 np.broadcast_to(
-                                 correct_disp[:,i*shift_msd,0][:, np.newaxis],
-                                 correct_disp[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape
-                                )
-                            ).sum(axis=0) / n_picking
-    
-    ACF_pred += (orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0]*
-                 np.broadcast_to(
-                                 orbits[:,i*shift_msd,0][:, np.newaxis],
-                                 orbits[:,i*shift_msd:i*shift_msd+nmsdtime,0].shape
-                                )
-                            ).sum(axis=0) / n_picking
+    # スライスの範囲がデータサイズを超えないように制御
+    start = i * shift_msd
+    end = min(start + nmsdtime, correct_disp.shape[1])
+    n_actual = end - start  # 実際のスライス長
+
+    if n_actual <= 0:
+        continue  # 範囲外ならスキップ
+
+    # スライスされたデータ
+    disp_slice = correct_disp[:, start:end, 0]
+
+    # ブロードキャスト用のデータを準備 (1D -> 2D)
+    ref_data = correct_disp[:, start, 0][:, np.newaxis]
+    ref_broadcasted = np.tile(ref_data, (1, n_actual))
+
+    # ACF の計算
+    ACF_true[:n_actual] += (disp_slice * ref_broadcasted).sum(axis=0) / n_picking
+
+    # 同様の処理 for `orbits`
+    orbit_slice = orbits[:, start:end, 0]
+    orbit_ref_data = orbits[:, start, 0][:, np.newaxis]
+    orbit_ref_broadcasted = np.tile(orbit_ref_data, (1, n_actual))
+
+    ACF_pred[:n_actual] += (orbit_slice * orbit_ref_broadcasted).sum(axis=0) / n_picking
+
 
 ####
 
@@ -935,43 +968,13 @@ ax = fig.add_subplot(111)
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#------------------------
-
-plt.plot(time,ACF_true,color="red")
-
-
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("HFACF [W/m$^2$",fontsize = 30)
-
-
-# plt.legend(fontsize = 30)
-
-plt.minorticks_on()
-
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
-
-plt.savefig(r"/home/kawaguchi/result/ACF_true.png")
-plt.close()
-
-#figure detail
-
-fig = plt.figure(figsize = (10,10))
-
-ax = fig.add_subplot(111)
-
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-#------------------------
-
 plt.plot(time,ACF_pred,color='blue')
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("HFACF [W/m$^2$",fontsize = 30)
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
 
+ax.set_ylim(-3e18, 7e18)
 
 # plt.legend(fontsize = 30)
 
@@ -995,11 +998,41 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
+plt.plot(time,ACF_true,color="red")
+
+
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+
+ax.set_ylim(-3e18, 7e18)
+
+# plt.legend(fontsize = 30)
+
+plt.minorticks_on()
+
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
+
+plt.savefig(r"/home/kawaguchi/result/ACF_true.png")
+plt.close()
+
+#figure detail
+
+fig = plt.figure(figsize = (10,10))
+
+ax = fig.add_subplot(111)
+
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+#------------------------
+
 plt.plot(time,ACF_pred,color="blue")
 plt.plot(time,ACF_true,color="red")
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("HFACF [W/m$^2$",fontsize = 30)
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1019,24 +1052,26 @@ area = 39.2*39.2*10**-20
 boltz = 1.3806662*10**(-23)
 
 
-ITR_true = np.zeros((nmsdtime-1,))
+integration_true = np.zeros((nmsdtime-1))
+ITR_true = np.zeros((nmsdtime-1))
 # GK_int_correct_x = np.zeros((nmsdtime-1))
 # GK_int_correct_y = np.zeros((nmsdtime-1))
 # GK_int_correct_z = np.zeros((nmsdtime-1))
 
-ITR_pred = np.zeros((nmsdtime-1,))
+integration_pred = np.zeros((nmsdtime-1))
+ITR_pred = np.zeros((nmsdtime-1))
 # GK_int_orbits_x = np.zeros((nmsdtime-1))
 # GK_int_orbits_y = np.zeros((nmsdtime-1))
 # GK_int_orbits_z = np.zeros((nmsdtime-1))
 
 for i in range(0,nmsdtime-1-1):
 
-    ITR_true[i+1] = ITR_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*dt*fs
+    integration_true[i+1] = integration_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*dt*fs
     # GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
 
-    ITR_pred[i+1] = ITR_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*dt*fs
+    integration_pred[i+1] = integration_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*dt*fs
     # GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
@@ -1044,11 +1079,12 @@ for i in range(0,nmsdtime-1-1):
 
 for i in range(1, nmsdtime-1):
 
-    ITR_true[i] = boltz*T**2/area/ITR_true[i]
-    ITR_pred[i] = boltz*T**2/area/ITR_pred[i]
+    ITR_true[i] = boltz*T**2/area/integration_true[i]
+    ITR_pred[i] = boltz*T**2/area/integration_pred[i]
     pass
 
 time = np.arange(1,nmsdtime)*dt*10**(-3)*stpRecord
+ITR_pred /= 100
 
 #figure detail
 
@@ -1067,26 +1103,31 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 plt.plot(time,ITR_pred,color="blue")
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("ITR [K · m$^2$/W]",fontsize = 30)
+# 軸ラベルの設定
+plt.xlabel("Time ps", fontsize=30)
+plt.ylabel("ITR K · m$^2$/W", fontsize=30)
 
-# plt.legend(fontsize = 30)
+# y軸を指数表記に設定
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
+# 軸のフォントサイズ設定
+ax.tick_params(labelsize=30, which="both", direction="in")
+
+# y軸オフセットテキストのフォントサイズ設定
+ax.yaxis.offsetText.set_fontsize(40)
+
+# minor ticks をオンにする
 plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# レイアウトの調整
 plt.tight_layout()
+
+# プロットの表示
 plt.show()
 
+# プロットを保存
 plt.savefig(r"/home/kawaguchi/result/ITR_pred.png")
 plt.close()
-
-fig = plt.figure(figsize = (10,10))
-
-ax = fig.add_subplot(111)
-
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
@@ -1095,8 +1136,8 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 plt.plot(time,ITR_true,color="red")
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("ITR [K · m$^2$/W]",fontsize = 30)
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("ITR K · m$^2$/W",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1117,8 +1158,8 @@ plt.plot(time,ITR_pred,color="blue")
 plt.plot(time,ITR_true,color="red")
 
 
-plt.xlabel("time [ps]",fontsize = 30)
-plt.ylabel("ITR [K · m$^2$/W]",fontsize = 30)
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("ITR K · m$^2$/W",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
