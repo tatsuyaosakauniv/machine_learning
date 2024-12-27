@@ -172,7 +172,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length = 1000
+sequence_length = 500
 batch_size = int(use_step/sequence_length)
 
 
