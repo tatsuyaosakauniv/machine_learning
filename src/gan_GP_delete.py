@@ -228,8 +228,8 @@ dim = 1
 hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
-gen_lr = 0.000002
-disc_lr = 0.0000004
+gen_lr = 0.0001 # <------------------学習率変更
+disc_lr = 0.00002
 
 #------------------------------------------------------------------------------------
 
@@ -419,25 +419,25 @@ def gradient_penalty(true_data,fake_data,batch_size):
     
     grads = gp_tape.gradient(pred, [interpolated])[0]
     norm = tf.sqrt(tf.reduce_sum(tf.square(grads),axis = [1,2]))
-    gp = tf.math.reduce_mean((norm)**2)
+    gp = tf.math.reduce_mean((norm)**2) # <--------------------- -1をしない
     return gp
 
-#GP_penaltyの実装(生成機用)
-def gradient_penaltyG(true_data,fake_data,batch_size):
-    alpha = tf.random.uniform([batch_size,1,1],minval = 0.0,maxval = 1.0,dtype=tf.float64)
-    true_data = tf.cast(true_data, tf.float64)
-    fake_data = tf.cast(fake_data, tf.float64)
-    diff = fake_data - true_data
-    interpolated = true_data*alpha*diff
+# #GP_penaltyの実装(生成機用)
+# def gradient_penaltyG(true_data,fake_data,batch_size):
+#     alpha = tf.random.uniform([batch_size,1,1],minval = 0.0,maxval = 1.0,dtype=tf.float64)
+#     true_data = tf.cast(true_data, tf.float64)
+#     fake_data = tf.cast(fake_data, tf.float64)
+#     diff = fake_data - true_data
+#     interpolated = true_data*alpha*diff
 
-    with tf.GradientTape() as gp_tape:
-        gp_tape.watch(interpolated)
-        pred = discriminator(interpolated,training = True)
+#     with tf.GradientTape() as gp_tape:
+#         gp_tape.watch(interpolated)
+#         pred = discriminator(interpolated,training = True)
     
-    grads = gp_tape.gradient(pred, [interpolated])[0]
-    norm = tf.sqrt(tf.reduce_sum(tf.square(grads),axis = [1,2]))
-    gp = tf.math.reduce_mean((norm)**2)
-    return gp
+#     grads = gp_tape.gradient(pred, [interpolated])[0]
+#     norm = tf.sqrt(tf.reduce_sum(tf.square(grads),axis = [1,2]))
+#     gp = tf.math.reduce_mean((norm)**2)
+#     return gp
 
 
 
@@ -556,65 +556,65 @@ latent_gL_list = []
 dL_list = []
 
 
-# ########################
-# #####   訓練実行   #####
-# ########################
+########################
+#####   訓練実行   #####
+########################
 
-# counter_for_iteration = 0
-# count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
-#                     #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
+counter_for_iteration = 0
+count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
+                    #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
 
-# #-- training
-# save_count = 1
-# counter = 0
-# time_start = time.time()
+#-- training
+save_count = 1
+counter = 0
+time_start = time.time()
 
-# if(count_data_set == 0):
-#         train_data = []
+if(count_data_set == 0):
+        train_data = []
 
-#         temp = []
-#         for j in range(data_length):
-#             temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-#         train_data = np.array(temp)
-#         pass
-# print(np.shape(training_data))
-# print(np.shape(train_data))
+        temp = []
+        for j in range(data_length):
+            temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+        train_data = np.array(temp)
+        pass
+print(np.shape(training_data))
+print(np.shape(train_data))
 
-# for i in range(1,iteration_all+1):
-#     train_data = []
+for i in range(1,iteration_all+1):
+    train_data = []
 
-#     temp = []
-#     for j in range(data_length):
-#         temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-#     train_data = np.array(temp)
-#     pass
+    temp = []
+    for j in range(data_length):
+        temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+    train_data = np.array(temp)
+    pass
     
-#     train_step(train_sample = train_data)
-#     count_data_set += 1
+    train_step(train_sample = train_data)
+    count_data_set += 1
 
-#     #loss 出力
-#     average_d_loss = train_d_loss.result()
-#     average_g_loss = train_g_loss.result()
+    #loss 出力
+    average_d_loss = train_d_loss.result()
+    average_g_loss = train_g_loss.result()
 
-#     #loss画面表示
-#     print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
+    #loss画面表示
+    print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
 
-#     #loss値のリセット
-#     train_d_loss.reset_states()
-#     train_g_loss.reset_states()
+    #loss値のリセット
+    train_d_loss.reset_states()
+    train_g_loss.reset_states()
 
-#     #学習曲線のリストメイク
-#     iteration_list.append(counter_for_iteration)
-#     gL_list.append(average_g_loss)
-#     dL_list .append(average_d_loss)
+    #学習曲線のリストメイク
+    iteration_list.append(counter_for_iteration)
+    gL_list.append(average_g_loss)
+    dL_list .append(average_d_loss)
 
-#     pass
+    pass
 
-# generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
-# gen_array.append(generator)
-# save_count +=1
+generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
+gen_array.append(generator)
+save_count +=1
 
-# #-- 学習終了
+#-- 学習終了
 
 #学習曲線 描画
 
@@ -650,19 +650,19 @@ info_ad = pd.DataFrame(data=[["passed model",len(gen_array)]],columns = columns2
 info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-######################################################################################
-############################# 学習済みモデル呼び出し ##################################
-######################################################################################
-# モデルを既に学習済みならここを実行する．
-gen_array = []
-for i in range(1,2):
+# ######################################################################################
+# ############################# 学習済みモデル呼び出し ##################################
+# ######################################################################################
+# # モデルを既に学習済みならここを実行する．
+# gen_array = []
+# for i in range(1,2):
 
-    #load generator
-    generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
-    gen_array.append(generator)
-    pass
+#     #load generator
+#     generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
+#     gen_array.append(generator)
+#     pass
 
-print("gen_array:",len(gen_array))
+# print("gen_array:",len(gen_array))
 
 #######################################################################################
 ############################    予測フェーズ開始  ####################################
@@ -894,7 +894,7 @@ fs = 1.0E-15
 ps = 1.0E-12
 
 timePlot = 10.0 # 相関時間　[ps]
-timeSlide = 0.50 # ずらす時間 [ps]
+timeSlide = 1.0 # ずらす時間 [ps]   <--------------------------これを増やした
 timeInterval = 0.01 # プロット時間間隔 [ps]
 
 stpRecord = 10 # 
@@ -975,9 +975,9 @@ plt.plot(time,ACF_pred,color='blue')
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
-ax.set_ylim(-3e18, 7e18)
+ax.set_ylim(-3e18, 10e18)
 
 # plt.legend(fontsize = 30)
 
@@ -1005,9 +1005,9 @@ plt.plot(time,ACF_true,color="red")
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
-ax.set_ylim(-3e18, 7e18)
+ax.set_ylim(-3e18, 10e18)
 
 # plt.legend(fontsize = 30)
 
@@ -1035,7 +1035,7 @@ plt.plot(time,ACF_pred,color="blue")
 plt.plot(time,ACF_true,color="red")
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
