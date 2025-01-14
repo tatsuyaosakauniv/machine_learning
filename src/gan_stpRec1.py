@@ -228,7 +228,7 @@ dim = 1
 hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
-gen_lr = 0.00005 # <------------------学習率変更
+gen_lr = 0.00004 # <------------------学習率変更
 disc_lr = gen_lr / discriminator_extra_steps
 
 #------------------------------------------------------------------------------------
@@ -556,65 +556,65 @@ latent_gL_list = []
 dL_list = []
 
 
-########################
-#####   訓練実行   #####
-########################
+# ########################
+# #####   訓練実行   #####
+# ########################
 
-counter_for_iteration = 0
-count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
-                    #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
+# counter_for_iteration = 0
+# count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
+#                     #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
 
-#-- training
-save_count = 1
-counter = 0
-time_start = time.time()
+# #-- training
+# save_count = 1
+# counter = 0
+# time_start = time.time()
 
-if(count_data_set == 0):
-        train_data = []
+# if(count_data_set == 0):
+#         train_data = []
 
-        temp = []
-        for j in range(data_length):
-            temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-        train_data = np.array(temp)
-        pass
-print(np.shape(training_data))
-print(np.shape(train_data))
+#         temp = []
+#         for j in range(data_length):
+#             temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+#         train_data = np.array(temp)
+#         pass
+# print(np.shape(training_data))
+# print(np.shape(train_data))
 
-for i in range(1,iteration_all+1):
-    train_data = []
+# for i in range(1,iteration_all+1):
+#     train_data = []
 
-    temp = []
-    for j in range(data_length):
-        temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-    train_data = np.array(temp)
-    pass
+#     temp = []
+#     for j in range(data_length):
+#         temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+#     train_data = np.array(temp)
+#     pass
     
-    train_step(train_sample = train_data)
-    count_data_set += 1
+#     train_step(train_sample = train_data)
+#     count_data_set += 1
 
-    #loss 出力
-    average_d_loss = train_d_loss.result()
-    average_g_loss = train_g_loss.result()
+#     #loss 出力
+#     average_d_loss = train_d_loss.result()
+#     average_g_loss = train_g_loss.result()
 
-    #loss画面表示
-    print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
+#     #loss画面表示
+#     print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
 
-    #loss値のリセット
-    train_d_loss.reset_states()
-    train_g_loss.reset_states()
+#     #loss値のリセット
+#     train_d_loss.reset_states()
+#     train_g_loss.reset_states()
 
-    #学習曲線のリストメイク
-    iteration_list.append(counter_for_iteration)
-    gL_list.append(average_g_loss)
-    dL_list .append(average_d_loss)
+#     #学習曲線のリストメイク
+#     iteration_list.append(counter_for_iteration)
+#     gL_list.append(average_g_loss)
+#     dL_list .append(average_d_loss)
 
-    pass
+#     pass
 
-generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
-gen_array.append(generator)
-save_count +=1
+# generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
+# gen_array.append(generator)
+# save_count +=1
 
-#-- 学習終了
+# #-- 学習終了
 
 #学習曲線 描画
 
@@ -650,19 +650,19 @@ info_ad = pd.DataFrame(data=[["passed model",len(gen_array)]],columns = columns2
 info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# ######################################################################################
-# ############################# 学習済みモデル呼び出し ##################################
-# ######################################################################################
-# # モデルを既に学習済みならここを実行する．
-# gen_array = []
-# for i in range(1,2):
+######################################################################################
+############################# 学習済みモデル呼び出し ##################################
+######################################################################################
+# モデルを既に学習済みならここを実行する．
+gen_array = []
+for i in range(1,2):
 
-#     #load generator
-#     generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
-#     gen_array.append(generator)
-#     pass
+    #load generator
+    generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
+    gen_array.append(generator)
+    pass
 
-# print("gen_array:",len(gen_array))
+print("gen_array:",len(gen_array))
 
 #######################################################################################
 ############################    予測フェーズ開始  ####################################
@@ -897,7 +897,7 @@ timePlot = 10.0 # 相関時間　[ps]
 timeSlide = 0.01 # ずらす時間 [ps]   <--------------------------
 timeInterval = 0.01 # プロット時間間隔 [ps]
 
-stpRecord = 10 # 
+stpRecord = 1 # 
 
 
 stepPlot = int(timePlot*ps / fs / stpRecord)+1
@@ -945,7 +945,7 @@ for i in range(numEnsemble):
 
 ####
 
-time = np.arange(1,stepPlot+1)*dt*fs/ps*stpRecord
+time = np.arange(1,stepPlot+1)*dt*10**(-3)*stpRecord
 
 # ACF_true = ACF_true*10**10     # これなに？
 # ACF_pred = ACF_pred*10**10
@@ -1177,80 +1177,80 @@ plt.show()
 plt.savefig(r"/home/kawaguchi/result/ITR_pred_and_true.png")
 plt.close()
 
-# # --------------- ITC -----------------
+# --------------- ITC -----------------
 
-# # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-# plt.plot(time,1/ITR_pred,color="blue")
-
-
-# # 軸ラベルの設定
-# plt.xlabel("Time ps", fontsize=30)
-# plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
-
-# # y軸を指数表記に設定
-# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# # 軸のフォントサイズ設定
-# ax.tick_params(labelsize=30, which="both", direction="in")
-
-# # y軸オフセットテキストのフォントサイズ設定
-# ax.yaxis.offsetText.set_fontsize(40)
-
-# # minor ticks をオンにする
-# plt.minorticks_on()
-
-# # レイアウトの調整
-# plt.tight_layout()
-
-# # プロットの表示
-# plt.show()
-
-# # プロットを保存
-# plt.savefig(r"/home/kawaguchi/result/ITC_pred.png")
-# plt.close()
-
-# #------------------------
-
-# # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-
-# plt.plot(time,1/ITR_true,color="red")
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+plt.plot(time,1/ITR_pred,color="blue")
 
 
-# plt.xlabel("Time ps",fontsize = 30)
-# plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+# 軸ラベルの設定
+plt.xlabel("Time ps", fontsize=30)
+plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
 
-# # plt.legend(fontsize = 30)
+# y軸を指数表記に設定
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-# plt.minorticks_on()
+# 軸のフォントサイズ設定
+ax.tick_params(labelsize=30, which="both", direction="in")
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+# y軸オフセットテキストのフォントサイズ設定
+ax.yaxis.offsetText.set_fontsize(40)
 
-# plt.savefig(r"/home/kawaguchi/result/ITC_true.png")
-# plt.close()
+# minor ticks をオンにする
+plt.minorticks_on()
 
-# #------------------------
+# レイアウトの調整
+plt.tight_layout()
 
-# # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# プロットの表示
+plt.show()
 
-# plt.plot(time,1/ITR_pred,color="blue")
-# plt.plot(time,1/ITR_true,color="red")
+# プロットを保存
+plt.savefig(r"/home/kawaguchi/result/ITC_pred.png")
+plt.close()
+
+#------------------------
+
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+plt.plot(time,1/ITR_true,color="red")
 
 
-# plt.xlabel("Time ps",fontsize = 30)
-# plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
 
-# # plt.legend(fontsize = 30)
+# plt.legend(fontsize = 30)
 
-# plt.minorticks_on()
+plt.minorticks_on()
 
-# ax.tick_params(labelsize = 30, which = "both", direction = "in")
-# plt.tight_layout()
-# plt.show()
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
 
-# plt.savefig(r"/home/kawaguchi/result/ITC_pred_and_true.png")
-# plt.close()
+plt.savefig(r"/home/kawaguchi/result/ITC_true.png")
+plt.close()
+
+#------------------------
+
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+plt.plot(time,1/ITR_pred,color="blue")
+plt.plot(time,1/ITR_true,color="red")
+
+
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+
+# plt.legend(fontsize = 30)
+
+plt.minorticks_on()
+
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
+
+plt.savefig(r"/home/kawaguchi/result/ITC_pred_and_true.png")
+plt.close()
 
 D_PREDICTED = np.average(ITR_pred[int(0.6*stepPlot):])
 
