@@ -1066,12 +1066,12 @@ ITR_pred = np.zeros((nmsdtime-1))
 
 for i in range(0,nmsdtime-1-1):
 
-    integration_true[i+1] = integration_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*dt*fs
+    integration_true[i+1] = integration_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*timeInterval*ps
     # GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_y[i+1] = GK_int_correct_y[i] + ((correct_GK_y[i]+correct_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_correct_z[i+1] = GK_int_correct_z[i] + ((correct_GK_z[i]+correct_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
 
-    integration_pred[i+1] = integration_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*dt*fs
+    integration_pred[i+1] = integration_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*timeInterval*ps
     # GK_int_orbits_x[i+1]  = GK_int_orbits_x[i] + ((orbits_GK_x[i]+orbits_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_y[i+1]  = GK_int_orbits_y[i] + ((orbits_GK_y[i]+orbits_GK_y[i+1])/2.0)*dt*stepskip*10**(-15)
     # GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
@@ -1083,8 +1083,8 @@ for i in range(1, nmsdtime-1):
     ITR_pred[i] = boltz*T**2/area/integration_pred[i]
     pass
 
-time = np.arange(1,nmsdtime)*dt*10**(-3)*stpRecord
-ITR_pred /= 100
+time = np.arange(1,nmsdtime)*dt*fs*stpRecord/ps
+# ITR_pred /= 100
 
 #figure detail
 
@@ -1098,6 +1098,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # #------------------------
 # x, y, z は省略
 # #------------------------
+# ------------ ITR ---------------
 
 # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 plt.plot(time,ITR_pred,color="blue")
@@ -1172,7 +1173,80 @@ plt.show()
 plt.savefig(r"/home/kawaguchi/result/ITR_pred_and_true.png")
 plt.close()
 
+# --------------- ITC -----------------
 
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+plt.plot(time,1/ITR_pred,color="blue")
+
+
+# 軸ラベルの設定
+plt.xlabel("Time ps", fontsize=30)
+plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+
+# y軸を指数表記に設定
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+# 軸のフォントサイズ設定
+ax.tick_params(labelsize=30, which="both", direction="in")
+
+# y軸オフセットテキストのフォントサイズ設定
+ax.yaxis.offsetText.set_fontsize(40)
+
+# minor ticks をオンにする
+plt.minorticks_on()
+
+# レイアウトの調整
+plt.tight_layout()
+
+# プロットの表示
+plt.show()
+
+# プロットを保存
+plt.savefig(r"/home/kawaguchi/result/ITC_pred.png")
+plt.close()
+
+#------------------------
+
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+plt.plot(time,1/ITR_true,color="red")
+
+
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+
+# plt.legend(fontsize = 30)
+
+plt.minorticks_on()
+
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
+
+plt.savefig(r"/home/kawaguchi/result/ITC_true.png")
+plt.close()
+
+#------------------------
+
+# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+plt.plot(time,1/ITR_pred,color="blue")
+plt.plot(time,1/ITR_true,color="red")
+
+
+plt.xlabel("Time ps",fontsize = 30)
+plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+
+# plt.legend(fontsize = 30)
+
+plt.minorticks_on()
+
+ax.tick_params(labelsize = 30, which = "both", direction = "in")
+plt.tight_layout()
+plt.show()
+
+plt.savefig(r"/home/kawaguchi/result/ITC_pred_and_true.png")
+plt.close()
 
 D_PREDICTED = np.average(ITR_pred[int(0.6*nmsdtime):])
 
