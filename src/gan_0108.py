@@ -228,7 +228,7 @@ dim = 1
 hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
-gen_lr = 0.00005 # <------------------学習率変更
+gen_lr = 0.00004 # <------------------学習率変更
 disc_lr = gen_lr / discriminator_extra_steps
 
 #------------------------------------------------------------------------------------
@@ -556,93 +556,93 @@ latent_gL_list = []
 dL_list = []
 
 
-########################
-#####   訓練実行   #####
-########################
+# ########################
+# #####   訓練実行   #####
+# ########################
 
-counter_for_iteration = 0
-count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
-                    #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
+# counter_for_iteration = 0
+# count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
+#                     #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
 
-#-- training
-save_count = 1
-counter = 0
-time_start = time.time()
+# #-- training
+# save_count = 1
+# counter = 0
+# time_start = time.time()
 
-if(count_data_set == 0):
-        train_data = []
+# if(count_data_set == 0):
+#         train_data = []
 
-        temp = []
-        for j in range(data_length):
-            temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-        train_data = np.array(temp)
-        pass
-print(np.shape(training_data))
-print(np.shape(train_data))
+#         temp = []
+#         for j in range(data_length):
+#             temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+#         train_data = np.array(temp)
+#         pass
+# print(np.shape(training_data))
+# print(np.shape(train_data))
 
-for i in range(1,iteration_all+1):
-    train_data = []
+# for i in range(1,iteration_all+1):
+#     train_data = []
 
-    temp = []
-    for j in range(data_length):
-        temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-    train_data = np.array(temp)
-    pass
+#     temp = []
+#     for j in range(data_length):
+#         temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+#     train_data = np.array(temp)
+#     pass
     
-    train_step(train_sample = train_data)
-    count_data_set += 1
+#     train_step(train_sample = train_data)
+#     count_data_set += 1
 
-    #loss 出力
-    average_d_loss = train_d_loss.result()
-    average_g_loss = train_g_loss.result()
+#     #loss 出力
+#     average_d_loss = train_d_loss.result()
+#     average_g_loss = train_g_loss.result()
 
-    #loss画面表示
-    print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
+#     #loss画面表示
+#     print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
 
-    #loss値のリセット
-    train_d_loss.reset_states()
-    train_g_loss.reset_states()
+#     #loss値のリセット
+#     train_d_loss.reset_states()
+#     train_g_loss.reset_states()
 
-    #学習曲線のリストメイク
-    iteration_list.append(counter_for_iteration)
-    gL_list.append(average_g_loss)
-    dL_list .append(average_d_loss)
+#     #学習曲線のリストメイク
+#     iteration_list.append(counter_for_iteration)
+#     gL_list.append(average_g_loss)
+#     dL_list .append(average_d_loss)
 
-    pass
+#     pass
 
-generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
-gen_array.append(generator)
-save_count +=1
+# generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
+# gen_array.append(generator)
+# save_count +=1
 
-#-- 学習終了
+# #-- 学習終了
 
-#学習曲線 描画
+# #学習曲線 描画
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#plot
-# ax.plot(iteration_list,dL_list,color = "red",label  = "discriminator Loss")
-# ax.plot(iteration_list,gL_list,color = "green",label  = "latent generator Loss")
+# #plot
+# # ax.plot(iteration_list,dL_list,color = "red",label  = "discriminator Loss")
+# # ax.plot(iteration_list,gL_list,color = "green",label  = "latent generator Loss")
 
-ax.set_xlabel("iteration",fontsize = 30)
-ax.set_ylabel("Loss",fontsize = 30)
+# ax.set_xlabel("iteration",fontsize = 30)
+# ax.set_ylabel("Loss",fontsize = 30)
 
-ax.legend(fontsize = 30)
+# ax.legend(fontsize = 30)
 
-ax.minorticks_on()
+# ax.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.savefig(r"/home/kawaguchi/result/training_proceed.png")
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.savefig(r"/home/kawaguchi/result/training_proceed.png")
 
-plt.show()
+# plt.show()
 
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -650,19 +650,19 @@ info_ad = pd.DataFrame(data=[["passed model",len(gen_array)]],columns = columns2
 info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# ######################################################################################
-# ############################# 学習済みモデル呼び出し ##################################
-# ######################################################################################
-# # モデルを既に学習済みならここを実行する．
-# gen_array = []
-# for i in range(1,2):
+######################################################################################
+############################# 学習済みモデル呼び出し ##################################
+######################################################################################
+# モデルを既に学習済みならここを実行する．
+gen_array = []
+for i in range(1,2):
 
-#     #load generator
-#     generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
-#     gen_array.append(generator)
-#     pass
+    #load generator
+    generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
+    gen_array.append(generator)
+    pass
 
-# print("gen_array:",len(gen_array))
+print("gen_array:",len(gen_array))
 
 #######################################################################################
 ############################    予測フェーズ開始  ####################################

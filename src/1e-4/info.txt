@@ -1,0 +1,19 @@
+parameter,value
+data_step,30000000.0
+use_step,300000.0
+AVERAGE_OF_DATA,-35634533.667933255
+STD_OF_DATA,2993033066.850575
+sequence_length,500.0
+iteration_all,20000.0
+batch_size,600.0
+random_uniform_inf,0.0
+means2,0.0
+random_uniform_sup,1.0
+std2,1.0
+discriminator_extra_steps,5.0
+gen_lr,0.0001
+disc_lr,2e-05
+passed model,1.0
+data_num,60000.0
+D_pred_GK [m$^2$/s],8.716089079452636e-08
+D_correct_GK [m$^2$/s],1.3366649463446462e-07

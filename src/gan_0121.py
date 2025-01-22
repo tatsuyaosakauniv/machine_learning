@@ -36,6 +36,7 @@ def use_gpu():                                   #デフォルトではGPUを使
     #GPU計算をしたい時
     return
 
+# use_cpu()
 use_gpu()
 
 #------------------------------------------------------------------------------------
@@ -93,12 +94,15 @@ set_seed(1)
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "flow_check_top_1216.dat" 
+DATA_filename = "combined_0.1_3000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-
+parameter_dir = "standard"
+num_dir = "norm_-1"
+result_dir = parameter_dir + "/" + num_dir
+model_dir = parameter_dir + "_" + num_dir
 
 #------------------------------------------------------------------------------------
 
@@ -106,8 +110,8 @@ MD_DATA = np.loadtxt(data_name)
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 1000000 #MDのサンプルから取り出してくるデータ長
-use_step = 300000   #学習に使うデータ長
+data_step = 30000000 #MDのサンプルから取り出してくるデータ長
+use_step  = 300000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -134,7 +138,7 @@ data_of_MD[0, :, 0] = np.array(MD_DATA[:data_step, 1])     # 熱流束
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
-DATA_filename = "flow_check_top_1216.dat"                   #学習用ファイル
+DATA_filename = "combined_0.1_3000man.dat"                    #学習用ファイル
 data_name = address + DATA_filename
 
 TRAIN_DATA = np.loadtxt(data_name)
@@ -175,9 +179,17 @@ batch_size           : バッチ数
 sequence_length = 500
 batch_size = int(use_step/sequence_length)
 
-
-data_length = int(use_step/sequence_length)
 iteration_all = 20000
+data_length = int(use_step/sequence_length)
+
+# batch_size = 512
+# sequence_length = int(use_step/batch_size)
+
+# epoch = 50
+# data_length = batch_size
+# iteration_all = int(epoch * use_step / batch_size)
+
+
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 info_ad = pd.DataFrame(data=[["sequence_length",sequence_length]],columns = columns2)
 info = pd.concat([info,info_ad])
@@ -228,8 +240,8 @@ dim = 1
 hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
-gen_lr = 0.000002
-disc_lr = 0.0000004
+gen_lr = 5.0E-4 # <------------------学習率変更
+disc_lr = gen_lr / discriminator_extra_steps
 
 #------------------------------------------------------------------------------------
 
@@ -419,25 +431,25 @@ def gradient_penalty(true_data,fake_data,batch_size):
     
     grads = gp_tape.gradient(pred, [interpolated])[0]
     norm = tf.sqrt(tf.reduce_sum(tf.square(grads),axis = [1,2]))
-    gp = tf.math.reduce_mean((norm)**2)
+    gp = tf.math.reduce_mean((norm-1)**2) # <--------------------- -1をしない
     return gp
 
-#GP_penaltyの実装(生成機用)
-def gradient_penaltyG(true_data,fake_data,batch_size):
-    alpha = tf.random.uniform([batch_size,1,1],minval = 0.0,maxval = 1.0,dtype=tf.float64)
-    true_data = tf.cast(true_data, tf.float64)
-    fake_data = tf.cast(fake_data, tf.float64)
-    diff = fake_data - true_data
-    interpolated = true_data*alpha*diff
+# #GP_penaltyの実装(生成機用)
+# def gradient_penaltyG(true_data,fake_data,batch_size):
+#     alpha = tf.random.uniform([batch_size,1,1],minval = 0.0,maxval = 1.0,dtype=tf.float64)
+#     true_data = tf.cast(true_data, tf.float64)
+#     fake_data = tf.cast(fake_data, tf.float64)
+#     diff = fake_data - true_data
+#     interpolated = true_data*alpha*diff
 
-    with tf.GradientTape() as gp_tape:
-        gp_tape.watch(interpolated)
-        pred = discriminator(interpolated,training = True)
+#     with tf.GradientTape() as gp_tape:
+#         gp_tape.watch(interpolated)
+#         pred = discriminator(interpolated,training = True)
     
-    grads = gp_tape.gradient(pred, [interpolated])[0]
-    norm = tf.sqrt(tf.reduce_sum(tf.square(grads),axis = [1,2]))
-    gp = tf.math.reduce_mean((norm)**2)
-    return gp
+#     grads = gp_tape.gradient(pred, [interpolated])[0]
+#     norm = tf.sqrt(tf.reduce_sum(tf.square(grads),axis = [1,2]))
+#     gp = tf.math.reduce_mean((norm)**2)
+#     return gp
 
 
 
@@ -506,6 +518,8 @@ def train_step(train_sample):
             zip(d_gradient,discriminator.trainable_variables)
         )
     
+    # ------------------------------- 生成器のGPを削除してみる（一般的なWGANと同じ）
+
     ########################################
     # generator学習開始 #
     ########################################
@@ -527,9 +541,10 @@ def train_step(train_sample):
 
         g_cost = generator_loss(true_logits,fake_logits)
 
-        gp =  gradient_penaltyG(data,reconstruction,batch_size)
+        # 以下を変更
+        # gp =  gradient_penaltyG(data,reconstruction,batch_size)
         g_cost = tf.cast(g_cost, tf.float64)
-        g_loss = g_cost - gp*gp_weight
+        g_loss = g_cost #  - gp*gp_weight   <----------------------------------------------削除してみる
         
     gen_gradient = tape.gradient(g_loss,generator.trainable_variables)
 
@@ -607,7 +622,7 @@ for i in range(1,iteration_all+1):
 
     pass
 
-generator.save(r"/home/kawaguchi/model/"+"test_1205"+str(save_count)+".h5")
+generator.save(r"/home/kawaguchi/model/"+model_dir+".h5")
 gen_array.append(generator)
 save_count +=1
 
@@ -643,7 +658,7 @@ ax.minorticks_on()
 
 ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
-plt.savefig(r"/home/kawaguchi/result/training_proceed.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/training_proceed.png")
 plt.close()
 
 
@@ -660,7 +675,7 @@ info = pd.concat([info,info_ad])
 # for i in range(1,2):
 
 #     #load generator
-#     generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_1205"+str(i)+".h5",compile = False)
+#     generator = keras.models.load_model(r"/home/kawaguchi/model/"+model_dir+".h5",compile = False)
 #     gen_array.append(generator)
 #     pass
 
@@ -769,7 +784,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # Prediction displacement
 time_step = np.arange(1, np.shape(orbits[0])[0] + 1)
-time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 30  # 0～10にスケール変換
 
 ax.plot(time_step_scaled, orbits[0], color="blue")
 
@@ -785,7 +800,7 @@ ax.tick_params(labelsize=30, which="both", direction="in")
 plt.tight_layout()
 
 # 保存
-plt.savefig(r"/home/kawaguchi/result/heatflux_pred.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/heatflux_pred.png")
 plt.close()
 
 fig = plt.figure(figsize=(10, 10))
@@ -796,7 +811,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #prediction displacement
 time_step = np.arange(1, np.shape(orbits[0])[0] + 1)
-time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 30  # 0～10にスケール変換
 
 ax.plot(time_step_scaled, correct_disp[0],color = "red")
 
@@ -814,7 +829,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 # plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/heatflux_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/heatflux_true.png")
 plt.close()
 
 # 10ps間のみの熱流束の画像も作成
@@ -827,7 +842,7 @@ end_index = total_steps // 1000  # 配列長の1/1000
 
 # スライスしたタイムステップと対応するデータ
 time_step = np.arange(1, total_steps + 1)[:end_index] / 1000
-time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 30  # 0～10にスケール変換
 
 # データもスライス（例: orbits, correct_dispなど）
 orbits_sliced = orbits[0, :end_index]  # orbits の最初の1/1000を取得
@@ -857,7 +872,7 @@ for x_min, x_max in x_ranges:
 
     # Save the restricted range plot
     plt.tight_layout()
-    plt.savefig(f"/home/kawaguchi/result/heatflux_pred_{x_min}_{x_max}.png")
+    plt.savefig(f"/home/kawaguchi/result/" + result_dir + "/heatflux_pred_{x_min}_{x_max}.png")
     plt.close()
 
 for x_min, x_max in x_ranges:
@@ -882,7 +897,7 @@ for x_min, x_max in x_ranges:
 
     # Save the restricted range plot
     plt.tight_layout()
-    plt.savefig(f"/home/kawaguchi/result/heatflux_true_{x_min}_{x_max}.png")
+    plt.savefig(f"/home/kawaguchi/result/" + result_dir + "/heatflux_true_{x_min}_{x_max}.png")
     plt.close()  
 
 ########################
@@ -896,32 +911,32 @@ fs = 1.0E-15
 ps = 1.0E-12
 
 timePlot = 10.0 # 相関時間　[ps]
-timeSlide = 0.50 # ずらす時間 [ps]
-timeInterval = 0.01 # プロット時間間隔 [ps]
+timeSlide = 0.001 # ずらす時間 [ps]   <--------------------------
+timeInterval = 0.001 # プロット時間間隔 [ps]
 
-stpRecord = 10 # 
+stpRecord = 1 # 
 
 
-nmsdtime = int(timePlot*ps / fs / stpRecord)+1
-shift_msd = int(timeSlide*ps / fs / stpRecord)+1
-n_picking = int(data_step / shift_msd) # <-----------------------もしかして要らない？
+stepPlot = int(timePlot*1.0E+3)
+stepSlide = 1
+numEnsemble = int(data_step / stepSlide) # <-----------------------もしかして要らない？
 
-print("nmsdtime: ", nmsdtime)       # 1000 行   熱流束の時刻を 0 にリセットする間隔
-print("n_picking: ", n_picking)     # 100 行    矢印の個数　だと思ってたけど違うかも
-print("shift_msd: ", shift_msd)     # 50 行     計算のスタートをずらす間隔
+print("stepPlot: ", stepPlot)       # 1000 行   熱流束の時刻を 0 にリセットする間隔
+print("numEnsemble: ", numEnsemble)     # 100 行    矢印の個数　だと思ってたけど違うかも
+print("stepSlide: ", stepSlide)     # 50 行     計算のスタートをずらす間隔
 
 print("correct_disp: ", np.shape(correct_disp))
 print("orbits: ", np.shape(orbits))
 
 ####
 
-ACF_true = np.zeros((nmsdtime))
-ACF_pred = np.zeros((nmsdtime))
+ACF_true = np.zeros((stepPlot))
+ACF_pred = np.zeros((stepPlot))
 
-for i in range(n_picking):
+for i in range(numEnsemble):
     # スライスの範囲がデータサイズを超えないように制御
-    start = i * shift_msd
-    end = min(start + nmsdtime, correct_disp.shape[1])
+    start = i * stepSlide
+    end = min(start + stepPlot, correct_disp.shape[1])
     n_actual = end - start  # 実際のスライス長
 
     if n_actual <= 0:
@@ -935,19 +950,19 @@ for i in range(n_picking):
     ref_broadcasted = np.tile(ref_data, (1, n_actual))
 
     # ACF の計算
-    ACF_true[:n_actual] += (disp_slice * ref_broadcasted).sum(axis=0) / n_picking
+    ACF_true[:n_actual] += (disp_slice * ref_broadcasted).sum(axis=0) / numEnsemble
 
     # 同様の処理 for `orbits`
     orbit_slice = orbits[:, start:end, 0]
     orbit_ref_data = orbits[:, start, 0][:, np.newaxis]
     orbit_ref_broadcasted = np.tile(orbit_ref_data, (1, n_actual))
 
-    ACF_pred[:n_actual] += (orbit_slice * orbit_ref_broadcasted).sum(axis=0) / n_picking
+    ACF_pred[:n_actual] += (orbit_slice * orbit_ref_broadcasted).sum(axis=0) / numEnsemble
 
 
 ####
 
-time = np.arange(1,nmsdtime+1)*dt*10**(-3)*stpRecord
+time = np.arange(1,stepPlot+1)*dt*fs/ps*stpRecord
 
 # ACF_true = ACF_true*10**10     # これなに？
 # ACF_pred = ACF_pred*10**10
@@ -977,9 +992,9 @@ plt.plot(time,ACF_pred,color='blue')
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
-ax.set_ylim(-3e18, 7e18)
+# ax.set_ylim(-3e18, 10e18)
 
 # plt.legend(fontsize = 30)
 
@@ -989,7 +1004,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ACF_pred.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred.png")
 plt.close()
 
 #figure detail
@@ -1007,9 +1022,9 @@ plt.plot(time,ACF_true,color="red")
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
-ax.set_ylim(-3e18, 7e18)
+# ax.set_ylim(-3e18, 10e18)
 
 # plt.legend(fontsize = 30)
 
@@ -1019,7 +1034,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ACF_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.png")
 plt.close()
 
 #figure detail
@@ -1037,7 +1052,7 @@ plt.plot(time,ACF_pred,color="blue")
 plt.plot(time,ACF_true,color="red")
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF (W/m$^2)^2$",fontsize = 30)
+plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
 # plt.legend(fontsize = 30)
 
@@ -1047,7 +1062,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ACF_pred_and_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred_and_true.png")
 plt.close()
 
 #--------------------------
@@ -1057,19 +1072,19 @@ area = 39.2*39.2*10**-20
 boltz = 1.3806662*10**(-23)
 
 
-integration_true = np.zeros((nmsdtime-1))
-ITR_true = np.zeros((nmsdtime-1))
-# GK_int_correct_x = np.zeros((nmsdtime-1))
-# GK_int_correct_y = np.zeros((nmsdtime-1))
-# GK_int_correct_z = np.zeros((nmsdtime-1))
+integration_true = np.zeros((stepPlot-1))
+ITR_true = np.zeros((stepPlot-1))
+# GK_int_correct_x = np.zeros((stepPlot-1))
+# GK_int_correct_y = np.zeros((stepPlot-1))
+# GK_int_correct_z = np.zeros((stepPlot-1))
 
-integration_pred = np.zeros((nmsdtime-1))
-ITR_pred = np.zeros((nmsdtime-1))
-# GK_int_orbits_x = np.zeros((nmsdtime-1))
-# GK_int_orbits_y = np.zeros((nmsdtime-1))
-# GK_int_orbits_z = np.zeros((nmsdtime-1))
+integration_pred = np.zeros((stepPlot-1))
+ITR_pred = np.zeros((stepPlot-1))
+# GK_int_orbits_x = np.zeros((stepPlot-1))
+# GK_int_orbits_y = np.zeros((stepPlot-1))
+# GK_int_orbits_z = np.zeros((stepPlot-1))
 
-for i in range(0,nmsdtime-1-1):
+for i in range(0,stepPlot-1-1):
 
     integration_true[i+1] = integration_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*timeInterval*ps
     # GK_int_correct_x[i+1] = GK_int_correct_x[i] + ((correct_GK_x[i]+correct_GK_x[i+1])/2.0)*dt*stepskip*10**(-15)
@@ -1082,13 +1097,13 @@ for i in range(0,nmsdtime-1-1):
     # GK_int_orbits_z[i+1]  = GK_int_orbits_z[i] + ((orbits_GK_z[i]+orbits_GK_z[i+1])/2.0)*dt*stepskip*10**(-15)
     pass
 
-for i in range(1, nmsdtime-1):
+for i in range(1, stepPlot-1):
 
     ITR_true[i] = boltz*T**2/area/integration_true[i]
     ITR_pred[i] = boltz*T**2/area/integration_pred[i]
     pass
 
-time = np.arange(1,nmsdtime)*dt*fs*stpRecord/ps
+time = np.arange(1,stepPlot)*dt*fs*stpRecord/ps
 # ITR_pred /= 100
 
 #figure detail
@@ -1105,7 +1120,8 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 # #------------------------
 # ------------ ITR ---------------
 
-# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+# ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 plt.plot(time,ITR_pred,color="blue")
 
 
@@ -1132,12 +1148,12 @@ plt.tight_layout()
 plt.show()
 
 # プロットを保存
-plt.savefig(r"/home/kawaguchi/result/ITR_pred.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred.png")
 plt.close()
 
 #------------------------
 
-# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
 plt.plot(time,ITR_true,color="red")
 
@@ -1153,12 +1169,12 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ITR_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.png")
 plt.close()
 
 #------------------------
 
-# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
 plt.plot(time,ITR_pred,color="blue")
 plt.plot(time,ITR_true,color="red")
@@ -1175,97 +1191,97 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ITR_pred_and_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred_and_true.png")
 plt.close()
 
-# --------------- ITC -----------------
+# # --------------- ITC -----------------
 
-# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-plt.plot(time,1/ITR_pred,color="blue")
-
-
-# 軸ラベルの設定
-plt.xlabel("Time ps", fontsize=30)
-plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
-
-# y軸を指数表記に設定
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-
-# 軸のフォントサイズ設定
-ax.tick_params(labelsize=30, which="both", direction="in")
-
-# y軸オフセットテキストのフォントサイズ設定
-ax.yaxis.offsetText.set_fontsize(40)
-
-# minor ticks をオンにする
-plt.minorticks_on()
-
-# レイアウトの調整
-plt.tight_layout()
-
-# プロットの表示
-plt.show()
-
-# プロットを保存
-plt.savefig(r"/home/kawaguchi/result/ITC_pred.png")
-plt.close()
-
-#------------------------
-
-# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-
-plt.plot(time,1/ITR_true,color="red")
+# # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# plt.plot(time,1/ITR_pred,color="blue")
 
 
-plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+# # 軸ラベルの設定
+# plt.xlabel("Time ps", fontsize=30)
+# plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
 
-# plt.legend(fontsize = 30)
+# # y軸を指数表記に設定
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-plt.minorticks_on()
+# # 軸のフォントサイズ設定
+# ax.tick_params(labelsize=30, which="both", direction="in")
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# # y軸オフセットテキストのフォントサイズ設定
+# ax.yaxis.offsetText.set_fontsize(40)
 
-plt.savefig(r"/home/kawaguchi/result/ITC_true.png")
-plt.close()
+# # minor ticks をオンにする
+# plt.minorticks_on()
 
-#------------------------
+# # レイアウトの調整
+# plt.tight_layout()
 
-# ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+# # プロットの表示
+# plt.show()
 
-plt.plot(time,1/ITR_pred,color="blue")
-plt.plot(time,1/ITR_true,color="red")
+# # プロットを保存
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_pred.png")
+# plt.close()
+
+# #------------------------
+
+# # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+# plt.plot(time,1/ITR_true,color="red")
 
 
-plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+# plt.xlabel("Time ps",fontsize = 30)
+# plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
 
-# plt.legend(fontsize = 30)
+# # plt.legend(fontsize = 30)
 
-plt.minorticks_on()
+# plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.show()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ITC_pred_and_true.png")
-plt.close()
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_true.png")
+# plt.close()
 
-D_PREDICTED = np.average(ITR_pred[int(0.6*nmsdtime):])
+# #------------------------
+
+# # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
+
+# plt.plot(time,1/ITR_pred,color="blue")
+# plt.plot(time,1/ITR_true,color="red")
+
+
+# plt.xlabel("Time ps",fontsize = 30)
+# plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+
+# # plt.legend(fontsize = 30)
+
+# plt.minorticks_on()
+
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.show()
+
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_pred_and_true.png")
+# plt.close()
+
+D_PREDICTED = np.average(ITR_pred[int(0.6*stepPlot):])
 
 info_ad = pd.DataFrame(data=[["D_pred_GK [m$^2$/s]",D_PREDICTED]],columns = columns2)   # これわからん
 info = pd.concat([info,info_ad])
 
 
-D_CORRECT = np.average(ITR_true[int(0.6*nmsdtime):])
+D_CORRECT = np.average(ITR_true[int(0.6*stepPlot):])
 
 info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = columns2)
 info = pd.concat([info,info_ad])
 
 
-info.to_csv(r"/home/kawaguchi/result/info.txt",index = False)
+info.to_csv(r"/home/kawaguchi/result/" + result_dir + "/info.txt",index = False)
 
 
 VACF_temp = []
@@ -1292,5 +1308,5 @@ for i in ITR_pred:
     pass
 
 
-np.savetxt(r"/home/kawaguchi/result/VACF.txt",VACF_temp)
-np.savetxt(r"/home/kawaguchi/result/D_int.txt",D_int_temp)
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/VACF.txt",VACF_temp)
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/D_int.txt",D_int_temp)

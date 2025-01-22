@@ -36,6 +36,7 @@ def use_gpu():                                   #デフォルトではGPUを使
     #GPU計算をしたい時
     return
 
+# use_cpu()
 use_gpu()
 
 #------------------------------------------------------------------------------------
@@ -93,12 +94,15 @@ set_seed(1)
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "combined_0117.dat" 
+DATA_filename = "combined_0.1_3000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-
+parameter_dir = "standard"
+num_dir = "0121"
+result_dir = parameter_dir + "/" + num_dir
+model_dir = parameter_dir + "_" + num_dir
 
 #------------------------------------------------------------------------------------
 
@@ -107,7 +111,7 @@ MD_DATA = np.loadtxt(data_name)
 #データ前処理用の色々
 #!!!parameters
 data_step = 30000000 #MDのサンプルから取り出してくるデータ長
-use_step  = 300000   #学習に使うデータ長
+use_step  = 100000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -134,7 +138,7 @@ data_of_MD[0, :, 0] = np.array(MD_DATA[:data_step, 1])     # 熱流束
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
-DATA_filename = "combined_0117.dat"                   #学習用ファイル
+DATA_filename = "combined_0.1_3000man.dat"                    #学習用ファイル
 data_name = address + DATA_filename
 
 TRAIN_DATA = np.loadtxt(data_name)
@@ -172,12 +176,15 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length = 500
-batch_size = int(use_step/sequence_length)
+# sequence_length = 500
+# batch_size = int(use_step/sequence_length)
+batch_size = 512
+sequence_length = int(use_step/batch_size)
 
-
-data_length = int(use_step/sequence_length)
-iteration_all = 20000
+epoch = 50
+# data_length = int(use_step/sequence_length)
+data_length = batch_size
+iteration_all = int(epoch * use_step / batch_size)
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 info_ad = pd.DataFrame(data=[["sequence_length",sequence_length]],columns = columns2)
 info = pd.concat([info,info_ad])
@@ -228,7 +235,7 @@ dim = 1
 hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
-gen_lr = 0.00004 # <------------------学習率変更
+gen_lr = 1.0E-4 # <------------------学習率変更
 disc_lr = gen_lr / discriminator_extra_steps
 
 #------------------------------------------------------------------------------------
@@ -556,65 +563,65 @@ latent_gL_list = []
 dL_list = []
 
 
-# ########################
-# #####   訓練実行   #####
-# ########################
+########################
+#####   訓練実行   #####
+########################
 
-# counter_for_iteration = 0
-# count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
-#                     #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
+counter_for_iteration = 0
+count_data_set = 0  #学習データは30000step(use_step)．学習を時系列的に繋げて行うので，use_step/(sequence_length*3)-2個のデータが出来上がる．
+                    #時系列的なデータを使い切ったら，分子番号をランダムに指定してデータをピックアップし直す．そのフラグ管理用の変数．
 
-# #-- training
-# save_count = 1
-# counter = 0
-# time_start = time.time()
+#-- training
+save_count = 1
+counter = 0
+time_start = time.time()
 
-# if(count_data_set == 0):
-#         train_data = []
+if(count_data_set == 0):
+        train_data = []
 
-#         temp = []
-#         for j in range(data_length):
-#             temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-#         train_data = np.array(temp)
-#         pass
-# print(np.shape(training_data))
-# print(np.shape(train_data))
+        temp = []
+        for j in range(data_length):
+            temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+        train_data = np.array(temp)
+        pass
+print(np.shape(training_data))
+print(np.shape(train_data))
 
-# for i in range(1,iteration_all+1):
-#     train_data = []
+for i in range(1,iteration_all+1):
+    train_data = []
 
-#     temp = []
-#     for j in range(data_length):
-#         temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
-#     train_data = np.array(temp)
-#     pass
+    temp = []
+    for j in range(data_length):
+        temp.append(training_data[0,j*sequence_length:(j+1)*sequence_length])
+    train_data = np.array(temp)
+    pass
     
-#     train_step(train_sample = train_data)
-#     count_data_set += 1
+    train_step(train_sample = train_data)
+    count_data_set += 1
 
-#     #loss 出力
-#     average_d_loss = train_d_loss.result()
-#     average_g_loss = train_g_loss.result()
+    #loss 出力
+    average_d_loss = train_d_loss.result()
+    average_g_loss = train_g_loss.result()
 
-#     #loss画面表示
-#     print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
+    #loss画面表示
+    print("iteration: {:}, d_loss: {:4f}, g_loss: {:4f}".format(i+1,average_d_loss,average_g_loss))
 
-#     #loss値のリセット
-#     train_d_loss.reset_states()
-#     train_g_loss.reset_states()
+    #loss値のリセット
+    train_d_loss.reset_states()
+    train_g_loss.reset_states()
 
-#     #学習曲線のリストメイク
-#     iteration_list.append(counter_for_iteration)
-#     gL_list.append(average_g_loss)
-#     dL_list .append(average_d_loss)
+    #学習曲線のリストメイク
+    iteration_list.append(counter_for_iteration)
+    gL_list.append(average_g_loss)
+    dL_list .append(average_d_loss)
 
-#     pass
+    pass
 
-# generator.save(r"/home/kawaguchi/model/"+"test_0117"+str(save_count)+".h5")
-# gen_array.append(generator)
-# save_count +=1
+generator.save(r"/home/kawaguchi/model/"+model_dir+".h5")
+gen_array.append(generator)
+save_count +=1
 
-# #-- 学習終了
+#-- 学習終了
 
 #学習曲線 描画
 
@@ -628,11 +635,17 @@ ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #plot
-# ax.plot(iteration_list,dL_list,color = "red",label  = "discriminator Loss")
-# ax.plot(iteration_list,gL_list,color = "green",label  = "latent generator Loss")
+ax.plot(iteration_list,dL_list,color = "orange",label  = "discriminator Loss")
+ax.plot(iteration_list,gL_list,color = "green",label  = "generator Loss")
 
-ax.set_xlabel("iteration",fontsize = 30)
+ax.set_xlabel("Iteration",fontsize = 30)
 ax.set_ylabel("Loss",fontsize = 30)
+
+ax.set_xlim(0, iteration_all)
+
+min_loss = min(min(gL_list), min(dL_list))
+max_loss = max(max(gL_list), max(dL_list))
+ax.set_ylim(min_loss, max_loss)
 
 ax.legend(fontsize = 30)
 
@@ -640,9 +653,8 @@ ax.minorticks_on()
 
 ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
-plt.savefig(r"/home/kawaguchi/result/training_proceed.png")
-
-plt.show()
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/training_proceed.svg")
+plt.close()
 
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -650,19 +662,19 @@ info_ad = pd.DataFrame(data=[["passed model",len(gen_array)]],columns = columns2
 info = pd.concat([info,info_ad])
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-######################################################################################
-############################# 学習済みモデル呼び出し ##################################
-######################################################################################
-# モデルを既に学習済みならここを実行する．
-gen_array = []
-for i in range(1,2):
+# ######################################################################################
+# ############################# 学習済みモデル呼び出し ##################################
+# ######################################################################################
+# # モデルを既に学習済みならここを実行する．
+# gen_array = []
+# for i in range(1,2):
 
-    #load generator
-    generator = keras.models.load_model(r"/home/kawaguchi/model/"+"test_0117"+str(i)+".h5",compile = False)
-    gen_array.append(generator)
-    pass
+#     #load generator
+#     generator = keras.models.load_model(r"/home/kawaguchi/model/"+model_dir+".h5",compile = False)
+#     gen_array.append(generator)
+#     pass
 
-print("gen_array:",len(gen_array))
+# print("gen_array:",len(gen_array))
 
 #######################################################################################
 ############################    予測フェーズ開始  ####################################
@@ -673,7 +685,8 @@ print("gen_array:",len(gen_array))
 ############################################################
 prediction_times = 1    #サンプルの生成数（この数だけ一つのモデルがdata_stepのデータ長のトラジェクトリを生成する．）
 
-data_num = int(data_step/(sequence_length)) #繰り返し予測回数
+# data_num = int(data_step/(sequence_length)) #繰り返し予測回数
+data_num = data_step #繰り返し予測回数
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 info_ad = pd.DataFrame(data=[["data_num",data_num]],columns = columns2)
@@ -767,7 +780,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # Prediction displacement
 time_step = np.arange(1, np.shape(orbits[0])[0] + 1)
-time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 30  # 0～10にスケール変換
 
 ax.plot(time_step_scaled, orbits[0], color="blue")
 
@@ -783,7 +796,7 @@ ax.tick_params(labelsize=30, which="both", direction="in")
 plt.tight_layout()
 
 # 保存
-plt.savefig(r"/home/kawaguchi/result/heatflux_pred.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/heatflux_pred.svg")
 plt.close()
 
 fig = plt.figure(figsize=(10, 10))
@@ -794,7 +807,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #prediction displacement
 time_step = np.arange(1, np.shape(orbits[0])[0] + 1)
-time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 30  # 0～10にスケール変換
 
 ax.plot(time_step_scaled, correct_disp[0],color = "red")
 
@@ -812,7 +825,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 # plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/heatflux_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/heatflux_true.svg")
 plt.close()
 
 # 10ps間のみの熱流束の画像も作成
@@ -825,7 +838,7 @@ end_index = total_steps // 1000  # 配列長の1/1000
 
 # スライスしたタイムステップと対応するデータ
 time_step = np.arange(1, total_steps + 1)[:end_index] / 1000
-time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 10  # 0～10にスケール変換
+time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.min()) * 30  # 0～10にスケール変換
 
 # データもスライス（例: orbits, correct_dispなど）
 orbits_sliced = orbits[0, :end_index]  # orbits の最初の1/1000を取得
@@ -855,7 +868,7 @@ for x_min, x_max in x_ranges:
 
     # Save the restricted range plot
     plt.tight_layout()
-    plt.savefig(f"/home/kawaguchi/result/heatflux_pred_{x_min}_{x_max}.png")
+    plt.savefig(f"/home/kawaguchi/result/" + result_dir + "/heatflux_pred_{x_min}_{x_max}.svg")
     plt.close()
 
 for x_min, x_max in x_ranges:
@@ -880,7 +893,7 @@ for x_min, x_max in x_ranges:
 
     # Save the restricted range plot
     plt.tight_layout()
-    plt.savefig(f"/home/kawaguchi/result/heatflux_true_{x_min}_{x_max}.png")
+    plt.savefig(f"/home/kawaguchi/result/" + result_dir + "/heatflux_true_{x_min}_{x_max}.svg")
     plt.close()  
 
 ########################
@@ -895,13 +908,13 @@ ps = 1.0E-12
 
 timePlot = 10.0 # 相関時間　[ps]
 timeSlide = 0.001 # ずらす時間 [ps]   <--------------------------
-timeInterval = 0.01 # プロット時間間隔 [ps]
+timeInterval = 0.001 # プロット時間間隔 [ps]
 
 stpRecord = 1 # 
 
 
-stepPlot = int(timePlot*ps / fs / stpRecord)+1
-stepSlide = int(timeSlide*ps / fs / stpRecord)
+stepPlot = int(timePlot*1.0E+3)
+stepSlide = 1
 numEnsemble = int(data_step / stepSlide) # <-----------------------もしかして要らない？
 
 print("stepPlot: ", stepPlot)       # 1000 行   熱流束の時刻を 0 にリセットする間隔
@@ -987,7 +1000,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ACF_pred.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred.svg")
 plt.close()
 
 #figure detail
@@ -1017,7 +1030,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ACF_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.svg")
 plt.close()
 
 #figure detail
@@ -1045,7 +1058,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ACF_pred_and_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred_and_true.svg")
 plt.close()
 
 #--------------------------
@@ -1131,7 +1144,7 @@ plt.tight_layout()
 plt.show()
 
 # プロットを保存
-plt.savefig(r"/home/kawaguchi/result/ITR_pred.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred.svg")
 plt.close()
 
 #------------------------
@@ -1152,7 +1165,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ITR_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.svg")
 plt.close()
 
 #------------------------
@@ -1174,7 +1187,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/ITR_pred_and_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred_and_true.svg")
 plt.close()
 
 # # --------------- ITC -----------------
@@ -1206,7 +1219,7 @@ plt.close()
 # plt.show()
 
 # # プロットを保存
-# plt.savefig(r"/home/kawaguchi/result/ITC_pred.png")
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_pred.svg")
 # plt.close()
 
 # #------------------------
@@ -1227,7 +1240,7 @@ plt.close()
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/result/ITC_true.png")
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_true.svg")
 # plt.close()
 
 # #------------------------
@@ -1249,7 +1262,7 @@ plt.close()
 # plt.tight_layout()
 # plt.show()
 
-# plt.savefig(r"/home/kawaguchi/result/ITC_pred_and_true.png")
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_pred_and_true.svg")
 # plt.close()
 
 D_PREDICTED = np.average(ITR_pred[int(0.6*stepPlot):])
@@ -1264,7 +1277,7 @@ info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = co
 info = pd.concat([info,info_ad])
 
 
-info.to_csv(r"/home/kawaguchi/result/info.txt",index = False)
+info.to_csv(r"/home/kawaguchi/result/" + result_dir + "/info.txt",index = False)
 
 
 VACF_temp = []
@@ -1291,5 +1304,5 @@ for i in ITR_pred:
     pass
 
 
-np.savetxt(r"/home/kawaguchi/result/VACF.txt",VACF_temp)
-np.savetxt(r"/home/kawaguchi/result/D_int.txt",D_int_temp)
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/VACF.txt",VACF_temp)
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/D_int.txt",D_int_temp)

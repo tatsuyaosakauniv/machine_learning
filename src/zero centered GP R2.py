@@ -11,7 +11,6 @@ Gradient Penaltyの関数内のどこが違うのかを重点的に確認して�
 """
 
 
-
 discriminator_extra_steps = 5
 latent_lr = 0.000002
 gen_lr = 0.000002

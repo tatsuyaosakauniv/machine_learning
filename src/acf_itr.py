@@ -68,7 +68,7 @@ plt.rcParams["mathtext.fontset"]="stix"
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "combined_0.1_.dat" 
+DATA_filename = "combined_0.1_5000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
@@ -119,7 +119,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 # plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/a/heatflux_true.png")
+plt.savefig(r"/home/kawaguchi/result/5000/heatflux_true.png")
 plt.close()  
 
 ########################
@@ -134,13 +134,13 @@ ps = 1.0E-12
 
 timePlot = 10.0 # 相関時間　[ps]
 timeSlide = 0.001 # ずらす時間 [ps]   <--------------------------
-timeInterval = 0.01 # プロット時間間隔 [ps]
+timeInterval = 0.001 # プロット時間間隔 [ps]
 
 stpRecord = 1 # 
 
 
-stepPlot = int(timePlot*ps / fs / stpRecord)+1
-stepSlide = int(timeSlide*ps / fs / stpRecord)
+stepPlot = int(timePlot*1.0E+3)
+stepSlide = 1
 numEnsemble = int(data_step / stepSlide) # <-----------------------もしかして要らない？
 
 print("stepPlot: ", stepPlot)       # 1000 行   熱流束の時刻を 0 にリセットする間隔
@@ -203,7 +203,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/a/ACF_true.png")
+plt.savefig(r"/home/kawaguchi/result/5000/ACF_true.png")
 plt.close()
 
 #--------------------------
@@ -258,7 +258,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/a/ITR_true.png")
+plt.savefig(r"/home/kawaguchi/result/5000/ITR_true.png")
 plt.close()
 
 # # --------------- ITC -----------------
@@ -279,5 +279,5 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/a/ITC_true.png")
+plt.savefig(r"/home/kawaguchi/result/5000/ITC_true.png")
 plt.close()
