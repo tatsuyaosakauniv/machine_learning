@@ -68,10 +68,15 @@ plt.rcParams["mathtext.fontset"]="stix"
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "combined_0.1_5000man.dat" 
+DATA_filename = "combined_0.1_3000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
+
+parameter_dir = ""
+num_dir = "1000"
+result_dir = parameter_dir + "/" + num_dir
+model_dir = parameter_dir + "_" + num_dir
 
 #------------------------------------------------------------------------------------
 
@@ -79,7 +84,7 @@ MD_DATA = np.loadtxt(data_name)
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = MD_DATA.shape[0] #MDのサンプルから取り出してくるデータ長
+data_step = 10000000#MD_DATA.shape[0] #MDのサンプルから取り出してくるデータ長
 
 point_mol_num = 1
 dim = 1
@@ -119,7 +124,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 # plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/5000/heatflux_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/heatflux_true.svg", dpi=600, bbox_inches='tight')
 plt.close()  
 
 ########################
@@ -176,6 +181,13 @@ for i in range(numEnsemble):
 
 time = np.arange(1,stepPlot+1)*dt*fs/ps*stpRecord
 
+# データを結合（2列にする）
+ACF_true_data = np.column_stack((time, ACF_true))
+
+# ファイルに保存
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.dat", ACF_true_data, delimiter=" ", header="time,ACF_true", comments="")
+
+
 #figure detail
 
 fig = plt.figure(figsize = (10,10))
@@ -203,7 +215,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/5000/ACF_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.svg", dpi=600, bbox_inches='tight')
 plt.close()
 
 #--------------------------
@@ -229,6 +241,13 @@ for i in range(1, stepPlot-1):
     pass
 
 time = np.arange(1,stepPlot)*dt*fs*stpRecord/ps
+
+# データを結合（2列にする）
+ITR_true_data = np.column_stack((time, ITR_true))
+
+# ファイルに保存
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.dat", ITR_true_data, delimiter=" ", header="time,ITR_true", comments="")
+
 
 #figure detail
 
@@ -258,7 +277,7 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/5000/ITR_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.svg", dpi=600, bbox_inches='tight')
 plt.close()
 
 # # --------------- ITC -----------------
@@ -279,5 +298,5 @@ ax.tick_params(labelsize = 30, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
-plt.savefig(r"/home/kawaguchi/result/5000/ITC_true.png")
+plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_true.svg", dpi=600, bbox_inches='tight')
 plt.close()
