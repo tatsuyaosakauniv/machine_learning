@@ -99,8 +99,8 @@ data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "lr"
-num_dir = "1e-4"
+parameter_dir = "hidden"
+num_dir = "256"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -247,7 +247,7 @@ stds2 = 1.0
 
 dim = 1
 
-hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
+hidden_node = 256 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
 gen_lr = 1.0E-4 # <------------------学習率変更
@@ -968,14 +968,14 @@ hist_orbits, _ = np.histogram(orbits_flat, bins=500, range=x_range, density=True
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
 # ヒストグラムのプロット
-ax.plot(bin_centers, hist_correct, color='red', linestyle='-', alpha=0.9, linewidth=2.5, label="correct_disp")
-ax.plot(bin_centers, hist_orbits, color='blue', linestyle='-', alpha=0.9, linewidth=2.5, label="orbits")
+ax.plot(bin_centers, hist_correct, color='red', linestyle='-', alpha=0.9, linewidth=2.5, label="MD")
+ax.plot(bin_centers, hist_orbits, color='blue', linestyle='-', alpha=0.9, linewidth=2.5, label="GANs")
 
 # x=0 の点線を追加
 ax.axvline(x=0, color='gray', linestyle='--', linewidth=2)
 
 # グラフのラベルを設定
-ax.set_xlabel(r"Value", fontsize=25)
+ax.set_xlabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)
 ax.set_ylabel('Probability Density', fontsize=25)
 
 # 軸の設定
@@ -1394,3 +1394,9 @@ info = pd.concat([info,info_ad])
 
 
 info.to_csv(r"/home/kawaguchi/result/" + result_dir + "/info.txt",index = False)
+
+# ITRの描画時間を記録
+total_time = time.time()
+print(f"Total time: {total_time:.6f}s")
+with open(time_log_file, 'a') as f:
+    f.write(f"\nTotal time: {total_time:.6f}s\n")
