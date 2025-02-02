@@ -15,6 +15,7 @@ import time
 import pandas as pd
 
 matplotlib.rcParams['font.family'] = 'DejaVu Sans'  # 例: 安定したフォントを指定
+plt.rcParams["mathtext.fontset"] = "stix"
 
 #------------------------------------------------------------------------------------
 
@@ -66,7 +67,6 @@ class FixedOrderFormatter(ScalarFormatter):
 # いつかは出来るようにしたいけど，linuxでのTimes New Romanでの描画はFontがないですって言われる．一応エラー文みたいなのが出るけど問題なく回る．
 # TImes New Romanを使いたくて色々やってたら仮想環境が全部吹き飛んだので諦める．キレそう．
 plt.rcParams['font.family'] = 'Liberation Sans'
-plt.rcParams["mathtext.fontset"]="stix"
 
 #------------------------------------------------------------------------------------
 
@@ -99,13 +99,23 @@ data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "sl"
-num_dir = "750"
+parameter_dir = "lr"
+num_dir = "1e-4"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
 #------------------------------------------------------------------------------------
 
+# コードの開始時間を記録
+start_time = time.time()
+
+print("Process start")
+
+# 時間を記録するファイルを作成
+time_log_file = r"/home/kawaguchi/result/" + result_dir + "/time_log.txt"
+with open(time_log_file, 'w') as f:
+    f.write("Time Log\n")
+    f.write("="*20 + "\n")
 
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
@@ -176,7 +186,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length = 750
+sequence_length = 500
 batch_size = int(use_step/sequence_length)
 
 iteration_all = 20000
@@ -628,6 +638,13 @@ save_count +=1
 
 #-- 学習終了
 
+# 学習時間を記録
+learning_time = time.time()
+elapsed_learning_time = learning_time - start_time
+print(f"Learning time: {elapsed_learning_time:.6f}s")
+with open(time_log_file, 'a') as f:
+    f.write(f"Learning time: {elapsed_learning_time:.6f}s\n")
+
 #学習曲線 描画
 
 #figure detail
@@ -732,6 +749,13 @@ for j in range(data_num-1):     # ここのrangeを1減らして、予測を元�
 #一つのモデルから得られるトラジェクトリ数をリストに収める．
 orbits = orbit_per_onemol
 
+# 予測時間を記録
+predict_time = time.time()
+elapsed_predict_time = predict_time - learning_time
+print(f"Predict time: {elapsed_predict_time:.6f}s")
+with open(time_log_file, 'a') as f:
+    f.write(f"Predict time: {elapsed_predict_time:.6f}s\n")
+
 #-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#-----------------------#
 
 
@@ -789,14 +813,14 @@ time_step_scaled = (time_step - time_step.min()) / (time_step.max() - time_step.
 ax.plot(time_step_scaled, orbits[0], color="blue")
 
 ax.set_xlabel("Time ns", fontsize=30)
-ax.set_ylabel("Heat Flux W/m$^2$", fontsize=30)
+ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
 
 # x軸とy軸の範囲設定
 ax.set_xlim(0, 10)  # x軸を0～10に設定
 ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
 
 ax.minorticks_on()
-ax.tick_params(labelsize=30, which="both", direction="in")
+ax.tick_params(labelsize=27, which="both", direction="in")
 plt.tight_layout()
 
 # 保存
@@ -817,7 +841,7 @@ plt.close()
 
 
 # ax.set_xlabel("Time ns",fontsize = 30)
-# ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
+# ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
 
 # ax.set_xlim(0, 10)  # x軸を0～10に設定
 # ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
@@ -861,14 +885,14 @@ for x_min, x_max in x_ranges:
     ax.plot(time_step_scaled, orbits_sliced, color="blue")
 
     ax.set_xlabel("Time ps", fontsize=30)
-    ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
+    ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
     
     # Set x-axis range
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(-1.6e10, 1.6e10)
 
     ax.minorticks_on()
-    ax.tick_params(labelsize=30, which="both", direction="in")
+    ax.tick_params(labelsize=27, which="both", direction="in")
 
     # Save the restricted range plot
     plt.tight_layout()
@@ -886,19 +910,99 @@ for x_min, x_max in x_ranges:
     ax.plot(time_step_scaled, correct_disp_sliced, color="red")
 
     ax.set_xlabel("Time ps", fontsize=30)
-    ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
+    ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
 
     # Set x-axis range
     ax.set_xlim(x_min, x_max)  
     ax.set_ylim(-1.6e10, 1.6e10)
 
     ax.minorticks_on()
-    ax.tick_params(labelsize=30, which="both", direction="in")
+    ax.tick_params(labelsize=27, which="both", direction="in")
 
     # Save the restricted range plot
     plt.tight_layout()
     plt.savefig(f"/home/kawaguchi/result/" + result_dir + "/heatflux_true_{x_min}_{x_max}.svg", dpi=600, bbox_inches='tight')
     plt.close()  
+
+# #--------------------------
+
+# orbits の形状に合わせてデータを整形
+orbits_flat = orbits.flatten()
+correct_disp_flat = correct_disp.flatten()  # 事前にフラット化
+
+# # -------------熱流束の予測データを保存（時間がかかりそうなのでコメントアウトすることも検討）-------------
+
+# # 1e-6ずつ増加する値をdata_stepの長さの配列に設定
+# time_steps = np.arange(0, data_step * 1e-6, 1e-6)
+
+# # 必要に応じてサイズを調整（例としてdata_stepが3e7の場合）
+# time_steps = time_steps[:data_step]
+
+# # 時間ステップとorbitsデータを結合
+# data = np.column_stack((time_steps, orbits_flat))
+
+# # DataFrame にして .dat ファイルとして保存
+# df = pd.DataFrame(data, columns=["Time", "Pred"])
+# df.to_csv(f"/home/kawaguchi/result/" + result_dir + "/" + DATA_filename + "_pred.dat", sep=" ", index=False)
+# # #--------------------------
+# -------------熱流束データの確率密度分布-------------
+
+# グラフを作成
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# 軸の設定
+ax.yaxis.offsetText.set_fontsize(40)
+ax.xaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.xaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
+# ヒストグラムの範囲を計算
+max_abs_value = max(np.max(np.abs(correct_disp)), np.max(np.abs(orbits)))
+x_range = (-max_abs_value, max_abs_value)
+
+# ヒストグラムを計算 (確率密度で表示)
+hist_correct, bin_edges = np.histogram(correct_disp_flat, bins=500, range=x_range, density=True)
+hist_orbits, _ = np.histogram(orbits_flat, bins=500, range=x_range, density=True)
+
+# ビンの中心を計算
+bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+# ヒストグラムのプロット
+ax.plot(bin_centers, hist_correct, color='red', linestyle='-', alpha=0.9, linewidth=2.5, label="correct_disp")
+ax.plot(bin_centers, hist_orbits, color='blue', linestyle='-', alpha=0.9, linewidth=2.5, label="orbits")
+
+# x=0 の点線を追加
+ax.axvline(x=0, color='gray', linestyle='--', linewidth=2)
+
+# グラフのラベルを設定
+ax.set_xlabel(r"Value", fontsize=25)
+ax.set_ylabel('Probability Density', fontsize=25)
+
+# 軸の設定
+ax.tick_params(axis='both', labelsize=27, which="both", direction="in")
+
+# 凡例を追加
+ax.legend(fontsize=30, loc='upper left', frameon=True, facecolor='white', edgecolor='black')
+
+plt.minorticks_on()
+plt.tight_layout()
+
+# グラフを保存
+plt.savefig("/home/kawaguchi/result/" + result_dir + "/histogram_comparison.svg", dpi=600, bbox_inches='tight')
+
+# 必要に応じて表示
+# plt.show()
+
+# #--------------------------
+
+# 熱流束の描画時間を記録
+plot_flux_time = time.time()
+elapsed_plot_flux_time = plot_flux_time - predict_time
+print(f"Plot flux time: {elapsed_plot_flux_time:.6f}s")
+with open(time_log_file, 'a') as f:
+    f.write(f"Plot flux time: {elapsed_plot_flux_time:.6f}s\n")
+
+# #--------------------------
 
 ########################
 #####  Green-Kubo  #####
@@ -962,15 +1066,15 @@ for i in range(numEnsemble):
 
 ####
 
-time = np.arange(1,stepPlot+1)*dt*fs/ps*stpRecord
+md_time = np.arange(1,stepPlot+1)*dt*fs/ps*stpRecord
 
 # データを結合（2列にする）
-# ACF_true_data = np.column_stack((time, ACF_true))
-ACF_pred_data = np.column_stack((time, ACF_pred))
+# ACF_true_data = np.column_stack((md_time, ACF_true))
+ACF_pred_data = np.column_stack((md_time, ACF_pred))
 
 # ファイルに保存
-# np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.dat", ACF_true_data, delimiter=" ", header="time,ACF_true", comments="")
-np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred.dat", ACF_pred_data, delimiter=" ", header="time,ACF_pred", comments="")
+# np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.dat", ACF_true_data, delimiter=" ", header="md_time,ACF_true", comments="")
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred.dat", ACF_pred_data, delimiter=" ", header="md_time,ACF_pred", comments="")
 
 #figure detail
 
@@ -981,11 +1085,11 @@ ax = fig.add_subplot(111)
 ax.yaxis.offsetText.set_fontsize(40)
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-plt.plot(time,ACF_pred,color='blue')
+plt.plot(md_time,ACF_pred,color='blue')
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
+plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # ax.set_ylim(-3e18, 10e18)
 
@@ -1011,11 +1115,11 @@ plt.close()
 
 # #------------------------
 
-# plt.plot(time,ACF_true,color="red")
+# plt.plot(md_time,ACF_true,color="red")
 
 
 # plt.xlabel("Time ps",fontsize = 30)
-# plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
+# plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # # ax.set_ylim(-3e18, 10e18)
 
@@ -1041,11 +1145,11 @@ plt.close()
 
 # #------------------------
 
-# plt.plot(time,ACF_pred,color="blue")
-# plt.plot(time,ACF_true,color="red")
+# plt.plot(md_time,ACF_pred,color="blue")
+# plt.plot(md_time,ACF_true,color="red")
 
 # plt.xlabel("Time ps",fontsize = 30)
-# plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
+# plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # # plt.legend(fontsize = 30)
 
@@ -1057,6 +1161,15 @@ plt.close()
 
 # plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred_and_true.svg", dpi=600, bbox_inches='tight')
 # plt.close()
+
+# #--------------------------
+
+# ACFの描画時間を記録
+plot_ACF_time = time.time()
+elapsed_plot_ACF_time = plot_ACF_time - plot_flux_time
+print(f"Plot ACF time: {elapsed_plot_ACF_time:.6f}s")
+with open(time_log_file, 'a') as f:
+    f.write(f"Plot ACF time: {elapsed_plot_ACF_time:.6f}s\n")
 
 # #--------------------------
 
@@ -1084,15 +1197,15 @@ for i in range(1, stepPlot-1):
     ITR_pred[i] = boltz*T**2/area/integration_pred[i]
     pass
 
-time = np.arange(1,stepPlot)*dt*fs*stpRecord/ps
+md_time = np.arange(1,stepPlot)*dt*fs*stpRecord/ps
 
 # データを結合（2列にする）
-# ITR_true_data = np.column_stack((time, ITR_true))
-ITR_pred_data = np.column_stack((time, ITR_pred))
+# ITR_true_data = np.column_stack((md_time, ITR_true))
+ITR_pred_data = np.column_stack((md_time, ITR_pred))
 
 # ファイルに保存
-# np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.dat", ITR_true_data, delimiter=" ", header="time,ITR_true", comments="")
-np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred.dat", ITR_pred_data, delimiter=" ", header="time,ITR_pred", comments="")
+# np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.dat", ITR_true_data, delimiter=" ", header="md_time,ITR_true", comments="")
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred.dat", ITR_pred_data, delimiter=" ", header="md_time,ITR_pred", comments="")
 
 #figure detail
 
@@ -1110,18 +1223,18 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 
 # ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-plt.plot(time,ITR_pred,color="blue")
+plt.plot(md_time,ITR_pred,color="blue")
 
 
 # 軸ラベルの設定
 plt.xlabel("Time ps", fontsize=30)
-plt.ylabel("ITR K · m$^2$/W", fontsize=30)
+plt.ylabel(r"ITR $\mathrm{K} \cdot \mathrm{m}^2 / \mathrm{W}$", fontsize=30)
 
 # y軸を指数表記に設定
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # 軸のフォントサイズ設定
-ax.tick_params(labelsize=30, which="both", direction="in")
+ax.tick_params(labelsize=27, which="both", direction="in")
 
 # y軸オフセットテキストのフォントサイズ設定
 ax.yaxis.offsetText.set_fontsize(40)
@@ -1143,11 +1256,11 @@ plt.close()
 
 # # ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
-# plt.plot(time,ITR_true,color="red")
+# plt.plot(md_time,ITR_true,color="red")
 
 
 # plt.xlabel("Time ps",fontsize = 30)
-# plt.ylabel("ITR K · m$^2$/W",fontsize = 30)
+# plt.ylabel(r"ITR $\mathrm{K} \cdot \mathrm{m}^2 / \mathrm{W}$", fontsize=30)
 
 # # plt.legend(fontsize = 30)
 
@@ -1164,12 +1277,12 @@ plt.close()
 
 # # ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
-# plt.plot(time,ITR_pred,color="blue")
-# plt.plot(time,ITR_true,color="red")
+# plt.plot(md_time,ITR_pred,color="blue")
+# plt.plot(md_time,ITR_true,color="red")
 
 
 # plt.xlabel("Time ps",fontsize = 30)
-# plt.ylabel("ITR K · m$^2$/W",fontsize = 30)
+# plt.ylabel(r"ITR $\mathrm{K} \cdot \mathrm{m}^2 / \mathrm{W}$", fontsize=30)
 
 # # plt.legend(fontsize = 30)
 
@@ -1182,10 +1295,21 @@ plt.close()
 # plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred_and_true.svg", dpi=600, bbox_inches='tight')
 # plt.close()
 
+# #------------------------
+
+# ITRの描画時間を記録
+plot_ITR_time = time.time()
+elapsed_plot_ITR_time = plot_ITR_time - plot_ACF_time
+print(f"Plot ITR time: {elapsed_plot_ITR_time:.6f}s")
+with open(time_log_file, 'a') as f:
+    f.write(f"Plot ITR time: {elapsed_plot_ITR_time:.6f}s\n")
+
+# #------------------------
+
 # # --------------- ITC -----------------
 
 # # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
-# plt.plot(time,1/ITR_pred,color="blue")
+# plt.plot(md_time,1/ITR_pred,color="blue")
 
 
 # # 軸ラベルの設定
@@ -1196,7 +1320,7 @@ plt.close()
 # ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # # 軸のフォントサイズ設定
-# ax.tick_params(labelsize=30, which="both", direction="in")
+# ax.tick_params(labelsize=27, which="both", direction="in")
 
 # # y軸オフセットテキストのフォントサイズ設定
 # ax.yaxis.offsetText.set_fontsize(40)
@@ -1218,7 +1342,7 @@ plt.close()
 
 # # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
-# plt.plot(time,1/ITR_true,color="red")
+# plt.plot(md_time,1/ITR_true,color="red")
 
 
 # plt.xlabel("Time ps",fontsize = 30)
@@ -1239,8 +1363,8 @@ plt.close()
 
 # # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
-# plt.plot(time,1/ITR_pred,color="blue")
-# plt.plot(time,1/ITR_true,color="red")
+# plt.plot(md_time,1/ITR_pred,color="blue")
+# plt.plot(md_time,1/ITR_true,color="red")
 
 
 # plt.xlabel("Time ps",fontsize = 30)
@@ -1259,7 +1383,7 @@ plt.close()
 
 D_PREDICTED = np.average(ITR_pred[int(0.6*stepPlot):])
 
-info_ad = pd.DataFrame(data=[["D_pred_GK [m$^2$/s]",D_PREDICTED]],columns = columns2)   # これわからん
+info_ad = pd.DataFrame(data=[["ITR [K · m$^2$/W]",D_PREDICTED]],columns = columns2)   # これわからん
 info = pd.concat([info,info_ad])
 
 

@@ -13,21 +13,22 @@ plt.rcParams["mathtext.fontset"] = "stix"
 i_values = [0.01, 0.03, 0.05, 0.07, 0.1, 0.2]
 
 # 使用するデータファイル名のリスト
-data_files = ["flow_check_top_1.dat", "flow_check_top_2.dat", "flow_check_top_3.dat",
-            #   "flow_check_top_4.dat", "flow_check_top_5.dat",
-              "flow_check_bottom_1.dat", "flow_check_bottom_2.dat","flow_check_bottom_3.dat", 
-            #   "flow_check_bottom_4.dat", "flow_check_bottom_5.dat"
-              ]
+data_files = [
+    "flow_check_top_1.dat", "flow_check_top_2.dat", "flow_check_top_3.dat",
+    "flow_check_bottom_1.dat", "flow_check_bottom_2.dat", "flow_check_bottom_3.dat"
+]
 
-# カラーマップ（赤色のグラデーション）
-colors = cm.Reds(np.linspace(0.4, 1.0, len(i_values)))
+# カラーマップ（赤色のグラデーションを強調）
+colors = cm.Reds(np.linspace(0.2, 1.0, len(i_values)))
 
 # グラフを作成
 fig, ax = plt.subplots(figsize=(10, 10))
 
 # 軸の設定
 ax.yaxis.offsetText.set_fontsize(40)
+ax.xaxis.offsetText.set_fontsize(40)  # x軸の指数部分も大きくする
 ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+ax.xaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # データのプロット
 for i, color in zip(i_values, colors):
@@ -57,30 +58,21 @@ for i, color in zip(i_values, colors):
     # 中心位置を計算
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
-    # 線でつなげてプロット（赤のグラデーション）
-    ax.plot(bin_centers, hist, color=color, linestyle='-', alpha=0.7, label=f"$\\alpha$ = {i}")
+    # 線でつなげてプロット（グラデーションを強調、線を太く）
+    ax.plot(bin_centers, hist, color=color, linestyle='-', alpha=0.9, linewidth=2.5, label=f"$\\alpha$ = {i}")
 
 # グラフのラベルを設定
-ax.set_xlabel('Heat Flux', fontsize='30')
-ax.set_ylabel('Probability Density', fontsize='30')
-
-# 凡例を追加
-ax.legend(fontsize=30, loc='upper left')  # 右上に凡例を配置
-
-plt.minorticks_on()
-
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
+ax.set_xlabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)
+ax.set_ylabel('Probability Density', fontsize=25)
 
 # 軸の設定
-ax.yaxis.offsetText.set_fontsize(40)
-ax.xaxis.offsetText.set_fontsize(40)  # x軸の指数部分も大きくする
+ax.tick_params(axis='both', labelsize=27, which="both", direction="in")
 
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
-ax.xaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# 凡例を追加（背景を白にして視認性を向上）
+ax.legend(fontsize=30, loc='upper left', frameon=True, facecolor='white', edgecolor='black')
 
-# x軸とy軸のラベルのフォントサイズを設定
-ax.tick_params(axis='both', labelsize=30)
+plt.minorticks_on()
+plt.tight_layout()
 
 # グラフを保存
 plt.savefig("/home/kawaguchi/result/distribution.svg", dpi=600, bbox_inches='tight')

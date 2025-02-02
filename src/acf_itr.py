@@ -15,6 +15,7 @@ import time
 import pandas as pd
 
 matplotlib.rcParams['font.family'] = 'DejaVu Sans'  # 例: 安定したフォントを指定
+plt.rcParams['mathtext.fontset'] = 'dejavusans'  # 数式のフォントを DejaVu Sans に変更
 
 #------------------------------------------------------------------------------------
 
@@ -68,13 +69,13 @@ plt.rcParams["mathtext.fontset"]="stix"
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "combined_0.1_3000man.dat" 
+DATA_filename = "combined_0.01_4000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = ""
-num_dir = "1000"
+parameter_dir = "0.01"
+num_dir = "4000"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -84,7 +85,7 @@ model_dir = parameter_dir + "_" + num_dir
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 10000000#MD_DATA.shape[0] #MDのサンプルから取り出してくるデータ長
+data_step = 40000000#MD_DATA.shape[0] #MDのサンプルから取り出してくるデータ長
 
 point_mol_num = 1
 dim = 1
@@ -112,7 +113,7 @@ ax.plot(time_step_scaled, correct_disp[0],color = "red")
 
 
 ax.set_xlabel("Time ns",fontsize = 30)
-ax.set_ylabel("Heat Flux W/m$^2$",fontsize = 30)
+ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
 
 ax.set_xlim(0, 10)  # x軸を0～10に設定
 ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
@@ -120,7 +121,7 @@ ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
 # ax.legend(fontsize = 30)
 
 ax.minorticks_on()
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
+ax.tick_params(labelsize = 27, which = "both", direction = "in")
 plt.tight_layout()
 # plt.show()
 
@@ -203,7 +204,7 @@ plt.plot(time,ACF_true,color="red")
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
+plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # ax.set_ylim(-3e18, 10e18)
 
@@ -211,7 +212,7 @@ plt.ylabel("HFACF $($W/m$^2)^2$",fontsize = 30)
 
 plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
+ax.tick_params(labelsize = 27, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
@@ -267,13 +268,13 @@ plt.plot(time,ITR_true,color="red")
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("ITR K · m$^2$/W",fontsize = 30)
+plt.ylabel(r"ITR $\mathrm{K} \cdot \mathrm{m}^2 / \mathrm{W}$", fontsize=30)
 
 # plt.legend(fontsize = 30)
 
 plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
+ax.tick_params(labelsize = 27, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
@@ -288,13 +289,13 @@ plt.plot(time,1/ITR_true,color="red")
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel("ITC W/(K · m$^2$)", fontsize=30)
+plt.ylabel(r"ITC $\mathrm{W} / (\mathrm{K} \cdot \mathrm{m}^2)$", fontsize=30)
 
 # plt.legend(fontsize = 30)
 
 plt.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
+ax.tick_params(labelsize = 27, which = "both", direction = "in")
 plt.tight_layout()
 plt.show()
 
