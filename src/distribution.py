@@ -64,7 +64,7 @@ for i, color in zip(i_values, colors_gradient):
     ax.plot(bin_centers, hist, color=color, linestyle='-', alpha=0.9, linewidth=2.5, label=f"$\\alpha$ = {i}")
 
 # x=0 の点線を追加
-ax.axvline(x=0, color='gray', linestyle='--', linewidth=2)
+ax.axvline(x=0, color='gray', linestyle='--', linewidth=2, alpha=0.5, zorder=0)
 
 # グラフのラベルを設定
 ax.set_xlabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)
