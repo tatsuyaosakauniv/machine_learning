@@ -99,8 +99,8 @@ data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "0202"
-num_dir = "5"
+parameter_dir = "hidden"
+num_dir = "256"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -120,8 +120,8 @@ with open(time_log_file, 'w') as f:
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 20000000 #MDのサンプルから取り出してくるデータ長
-use_step  = 400000   #学習に使うデータ長
+data_step = 30000000 #MDのサンプルから取り出してくるデータ長
+use_step  = 300000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -186,7 +186,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length = 1000
+sequence_length = 500
 batch_size = int(use_step/sequence_length)
 
 iteration_all = 20000
@@ -247,7 +247,7 @@ stds2 = 1.0
 
 dim = 1
 
-hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
+hidden_node = 256 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
 gen_lr = 1.0E-4 # <------------------学習率変更
@@ -332,9 +332,9 @@ nxout = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.laye
 nx = tf.keras.layers.Concatenate(axis=1)([innx,nxout])
 
 #-- hidden layers
-x1 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(nx)
-x2 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x1)
-x3 = tf.keras.layers.Dense(hidden_node, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x2)
+x1 = tf.keras.layers.Dense(512, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(nx)
+x2 = tf.keras.layers.Dense(256, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x1)
+x3 = tf.keras.layers.Dense(128, activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(x2)
 
 #-- output
 decoded = tf.keras.layers.Dense(units = sequence_length*dim)(x3)
@@ -351,7 +351,7 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = 128, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
@@ -369,9 +369,9 @@ flat2 = layers.Flatten()(dc2)
 
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
 #
-dd1 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
-dd2 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
-dd3 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
+dd1 = layers.Dense(units = 128,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
+dd2 = layers.Dense(units = 256,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
+dd3 = layers.Dense(units = 512,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
 
 #-- output
 disc_out = layers.Dense(1)(dd3)
@@ -1396,7 +1396,7 @@ info = pd.concat([info,info_ad])
 info.to_csv(r"/home/kawaguchi/result/" + result_dir + "/info.txt",index = False)
 
 # ITRの描画時間を記録
-total_time = time.time() - start_time
+total_time = time.time()
 print(f"Total time: {total_time:.6f}s")
 with open(time_log_file, 'a') as f:
     f.write(f"\nTotal time: {total_time:.6f}s\n")

@@ -15,4 +15,4 @@ gen_lr,0.0001
 disc_lr,2e-05
 passed model,1.0
 data_num,60000.0
-ITR [K · m$^2$/W],8.0806096788317e-08
+ITR [K · m$^2$/W],7.45791398979828e-08

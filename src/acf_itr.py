@@ -69,13 +69,13 @@ plt.rcParams["mathtext.fontset"]="stix"
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "combined_0.01_4000man.dat" 
+DATA_filename = "combined_0.03_3000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "0.01"
-num_dir = "4000"
+parameter_dir = "0.03"
+num_dir = ""
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -85,7 +85,7 @@ model_dir = parameter_dir + "_" + num_dir
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 40000000#MD_DATA.shape[0] #MDのサンプルから取り出してくるデータ長
+data_step = 30000000#MD_DATA.shape[0] #MDのサンプルから取り出してくるデータ長
 
 point_mol_num = 1
 dim = 1

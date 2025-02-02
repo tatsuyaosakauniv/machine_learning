@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.ticker as ptick
 import matplotlib.cm as cm
+import matplotlib.colors as mcolors
 from pathlib import Path  # ファイル存在チェック用
 
 # --- 図のデフォルト設定の変更 ---
@@ -18,8 +19,9 @@ data_files = [
     "flow_check_bottom_1.dat", "flow_check_bottom_2.dat", "flow_check_bottom_3.dat"
 ]
 
-# カラーマップ（赤色のグラデーションを強調）
-colors = cm.Reds(np.linspace(0.2, 1.0, len(i_values)))
+# 赤から山吹色へのカラーマップを作成
+colors = mcolors.LinearSegmentedColormap.from_list("red_yellow", ["#FFEA00", "#FF0000"])
+colors_gradient = colors(np.linspace(0.0, 1.0, len(i_values)))  # 順番を逆にしてグラデーションを適用
 
 # グラフを作成
 fig, ax = plt.subplots(figsize=(10, 10))
@@ -31,7 +33,7 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 ax.xaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # データのプロット
-for i, color in zip(i_values, colors):
+for i, color in zip(i_values, colors_gradient):
     all_data = []  # iごとのデータを保存するリスト
 
     for data_file in data_files:
@@ -60,6 +62,9 @@ for i, color in zip(i_values, colors):
 
     # 線でつなげてプロット（グラデーションを強調、線を太く）
     ax.plot(bin_centers, hist, color=color, linestyle='-', alpha=0.9, linewidth=2.5, label=f"$\\alpha$ = {i}")
+
+# x=0 の点線を追加
+ax.axvline(x=0, color='gray', linestyle='--', linewidth=2)
 
 # グラフのラベルを設定
 ax.set_xlabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)

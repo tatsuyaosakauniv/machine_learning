@@ -99,8 +99,8 @@ data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "0202"
-num_dir = "5"
+parameter_dir = "lr_decrease"
+num_dir = "1"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -121,7 +121,7 @@ with open(time_log_file, 'w') as f:
 #データ前処理用の色々
 #!!!parameters
 data_step = 20000000 #MDのサンプルから取り出してくるデータ長
-use_step  = 400000   #学習に使うデータ長
+use_step  = 200000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -186,7 +186,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length = 1000
+sequence_length = 500
 batch_size = int(use_step/sequence_length)
 
 iteration_all = 20000
@@ -270,12 +270,26 @@ def generator_loss(true_data,recon_data):
 
 #WGAN-GPではAdamを，WGANではRMSpropを使うらしいが，自分の場合はRMSpropの方が上手くいっているのでこちらを使う．正直，RMSpropとAdamの優劣はつかない気がする．
 
+# 学習率スケジュールを設定
+lr_schedule_gen = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate=gen_lr,
+    decay_steps=500,  # 500ステップごとに学習率を減少
+    decay_rate=0.96,   # 学習率を96%に減少
+    staircase=True)
+
+lr_schedule_disc = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate=disc_lr,  # ディスクリミネーターの学習率は通常より低く
+    decay_steps=500,  # 500ステップごとに学習率を減少
+    decay_rate=0.96,   # 学習率を96%に減少
+    staircase=True)
+
+# 学習率スケジュールを適用したオプティマイザー
 generator_optimizer = keras.optimizers.RMSprop(
-    learning_rate = gen_lr
+    learning_rate=lr_schedule_gen
 )
 
 discriminator_optimizer = keras.optimizers.RMSprop(
-    learning_rate = disc_lr
+    learning_rate=lr_schedule_disc
 )
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
