@@ -1,0 +1,9 @@
+Time Log
+====================
+Learning time: 1522.501019s
+Predict time: 1702.058978s
+Plot flux time: 4.090336s
+Plot ACF time: 1594.187988s
+Plot ITR time: 0.484623s
+
+Total time: 4823.325965s

@@ -99,8 +99,8 @@ data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "0202"
-num_dir = "5"
+parameter_dir = "0204"
+num_dir = "2"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -120,8 +120,8 @@ with open(time_log_file, 'w') as f:
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 20000000 #MDのサンプルから取り出してくるデータ長
-use_step  = 400000   #学習に使うデータ長
+data_step = 30000000 #MDのサンプルから取り出してくるデータ長
+use_step  = 512000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -250,7 +250,7 @@ dim = 1
 hidden_node = 128 # 隠れ層のノード数　　<------------------- 追加
 
 discriminator_extra_steps = 5
-gen_lr = 1.0E-4 # <------------------学習率変更
+gen_lr = 1.2E-4 # <------------------学習率変更
 disc_lr = gen_lr / discriminator_extra_steps
 
 #------------------------------------------------------------------------------------
@@ -972,7 +972,7 @@ ax.plot(bin_centers, hist_correct, color='red', linestyle='-', alpha=0.9, linewi
 ax.plot(bin_centers, hist_orbits, color='blue', linestyle='-', alpha=0.9, linewidth=2.5, label="GANs")
 
 # x=0 の点線を追加
-ax.axvline(x=0, color='gray', linestyle='--', linewidth=2)
+ax.axvline(x=0, color='gray', linestyle='--', linewidth=2, alpha=0.5, zorder=0)
 
 # グラフのラベルを設定
 ax.set_xlabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)

@@ -99,8 +99,8 @@ data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "0202"
-num_dir = "5"
+parameter_dir = "test"
+num_dir = "1"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -120,8 +120,8 @@ with open(time_log_file, 'w') as f:
 #---   データ読み込み及び必要なパラメ―タ処理2 (主に機械学習でどれだけデータを使うかなどを指定する．)
 #データ前処理用の色々
 #!!!parameters
-data_step = 20000000 #MDのサンプルから取り出してくるデータ長
-use_step  = 400000   #学習に使うデータ長
+data_step = 30000000 #MDのサンプルから取り出してくるデータ長
+use_step  = 300000   #学習に使うデータ長
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
 columns2 = ["parameter","value"]
@@ -186,7 +186,7 @@ batch_size           : バッチ数
 """
 
 #!!!parameters
-sequence_length = 1000
+sequence_length = 500
 batch_size = int(use_step/sequence_length)
 
 iteration_all = 20000

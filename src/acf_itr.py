@@ -281,6 +281,15 @@ plt.show()
 plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.svg", dpi=600, bbox_inches='tight')
 plt.close()
 
+#figure detail
+
+fig = plt.figure(figsize = (10,10))
+
+ax = fig.add_subplot(111)
+
+ax.yaxis.offsetText.set_fontsize(40)
+ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+
 # # --------------- ITC -----------------
 
 # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)

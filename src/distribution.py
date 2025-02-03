@@ -19,9 +19,9 @@ data_files = [
     "flow_check_bottom_1.dat", "flow_check_bottom_2.dat", "flow_check_bottom_3.dat"
 ]
 
-# 赤から山吹色へのカラーマップを作成
-colors = mcolors.LinearSegmentedColormap.from_list("red_yellow", ["#FFEA00", "#FF0000"])
-colors_gradient = colors(np.linspace(0.0, 1.0, len(i_values)))  # 順番を逆にしてグラデーションを適用
+# レインボーカラーマップを使用
+colors_gradient = plt.cm.rainbow(np.linspace(0.0, 1.0, len(i_values)))
+
 
 # グラフを作成
 fig, ax = plt.subplots(figsize=(10, 10))
