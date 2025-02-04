@@ -20,7 +20,8 @@ ax.axvline(0, color='black', linewidth=1)  # y軸
 # ラベルと凡例
 ax.set_xlabel("x", fontsize=14)
 ax.set_ylabel("y", fontsize=14)
-ax.legend(fontsize=12)
+# 凡例を追加（背景を白にして視認性を向上）
+ax.legend(fontsize=30, loc='upper left')
 
 # 範囲指定（第一象限と第四象限）
 ax.set_xlim(0, 10)

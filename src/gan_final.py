@@ -327,7 +327,7 @@ noise_inputs = tf.keras.Input(shape = (sequence_length, dim)) # ガウスノイ�
 c_noise = tf.keras.layers.Conv1D(filters = 32, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(noise_inputs)
 flat_noise_g = tf.keras.layers.Flatten()(c_noise)
 innx = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(flat_noise_g)
-# mapping
+#-- mapping
 nxout = tf.keras.layers.Dense(units = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(innx)
 nx = tf.keras.layers.Concatenate(axis=1)([innx,nxout])
 
@@ -351,24 +351,17 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = hidden_node, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
-#
+#--
 dc2 = layers.Conv1D(filters = 16, kernel_size = 1,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat2 = layers.Flatten()(dc2)
 
-#
-# dc3 = layers.Conv1D(filters = 1024, kernel_size = 96,strides = 96,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
-# flat3 = layers.Flatten()(dc3)
-
-# #
-# dc4 = layers.Conv1D(filters = 512, kernel_size = 48,strides = 48,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
-# flat4 = layers.Flatten()(dc4)
-
 concat_layer_disc = tf.keras.layers.Concatenate(axis=1)([flat,flat2])
-#
+
+#--
 dd1 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(concat_layer_disc)
 dd2 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd1)
 dd3 = layers.Dense(units = hidden_node,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal")(dd2)
@@ -982,7 +975,7 @@ ax.set_ylabel('Probability Density', fontsize=25)
 ax.tick_params(axis='both', labelsize=27, which="both", direction="in")
 
 # 凡例を追加
-ax.legend(fontsize=30, loc='upper left', frameon=True, facecolor='white', edgecolor='black')
+ax.legend(fontsize=30, loc='upper left', frameon=True)
 
 plt.minorticks_on()
 plt.tight_layout()
@@ -1151,7 +1144,8 @@ plt.plot(md_time,ACF_true,color="red")
 plt.xlabel("Time ps",fontsize = 30)
 plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
-# plt.legend(fontsize = 30)
+# 凡例を追加
+ax.legend(fontsize=30, loc='upper left', frameon=True)
 
 plt.minorticks_on()
 
@@ -1301,7 +1295,8 @@ plt.plot(md_time,ITR_true,color="red")
 plt.xlabel("Time ps",fontsize = 30)
 plt.ylabel(r"ITR $\mathrm{K} \cdot \mathrm{m}^2 / \mathrm{W}$", fontsize=30)
 
-# plt.legend(fontsize = 30)
+# 凡例を追加
+ax.legend(fontsize=30, loc='upper left', frameon=True)
 
 plt.minorticks_on()
 
@@ -1414,7 +1409,8 @@ plt.plot(md_time,1/ITR_true,color="red")
 plt.xlabel("Time ps",fontsize = 30)
 plt.ylabel(r"ITC $\mathrm{W} / (\mathrm{K} \cdot \mathrm{m}^2)$", fontsize=30)
 
-# plt.legend(fontsize = 30)
+# 凡例を追加
+ax.legend(fontsize=30, loc='upper left', frameon=True)
 
 plt.minorticks_on()
 
