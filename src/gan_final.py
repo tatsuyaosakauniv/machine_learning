@@ -94,13 +94,13 @@ set_seed(1)
 #フォルダとファイル名指定及びその読み込み
 address = r"/home/kawaguchi/data/"               #r"[ファイルが入ってるフォルダー名]"+"/"
 
-DATA_filename = "combined_0.2_3000man.dat" 
+DATA_filename = "combined_0.01_3000man.dat" 
 data_name = address + DATA_filename
 
 MD_DATA = np.loadtxt(data_name)
 
-parameter_dir = "final"
-num_dir = "0.2"
+parameter_dir = "final_2.0"
+num_dir = "0.01"
 result_dir = parameter_dir + "/" + num_dir
 model_dir = parameter_dir + "_" + num_dir
 
@@ -148,7 +148,7 @@ data_of_MD[0, :, 0] = np.array(MD_DATA[:data_step, 1])     # 熱流束
 
 #学習データの成形（つまり，train data）-----------
 #学習用トラジェクトリデータ
-DATA_filename = "combined_0.2_3000man.dat"                    #学習用ファイル
+DATA_filename = "combined_0.01_3000man.dat"                    #学習用ファイル
 data_name = address + DATA_filename
 
 TRAIN_DATA = np.loadtxt(data_name)
@@ -351,7 +351,7 @@ generator.summary()
 disc_inputs = keras.Input(shape = (sequence_length, dim))
 
 #-- hidden layers
-dc1 = layers.Conv1D(filters = 2048, kernel_size = sequence_length,strides = sequence_length,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
+dc1 = layers.Conv1D(filters = 128, kernel_size = sequence_length,strides = 1,activation = tf.keras.layers.LeakyReLU(alpha = 0),kernel_initializer = "he_normal",padding = 'valid')(disc_inputs)
 flat = layers.Flatten()(dc1)
 
 
@@ -638,38 +638,38 @@ print(f"Learning time: {elapsed_learning_time:.6f}s")
 with open(time_log_file, 'a') as f:
     f.write(f"Learning time: {elapsed_learning_time:.6f}s\n")
 
-#学習曲線 描画
+# #学習曲線 描画
 
-#figure detail
+# #figure detail
 
-fig = plt.figure(figsize = (10,10))
+# fig = plt.figure(figsize = (10,10))
 
-ax = fig.add_subplot(111)
+# ax = fig.add_subplot(111)
 
-ax.yaxis.offsetText.set_fontsize(40)
-ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
+# ax.yaxis.offsetText.set_fontsize(40)
+# ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
-#plot
-ax.plot(iteration_list,dL_list,color = "orange",label  = "discriminator Loss")
-ax.plot(iteration_list,gL_list,color = "green",label  = "generator Loss")
+# #plot
+# ax.plot(iteration_list,dL_list,color = "orange",label  = "discriminator Loss")
+# ax.plot(iteration_list,gL_list,color = "green",label  = "generator Loss")
 
-ax.set_xlabel("Iteration",fontsize = 30)
-ax.set_ylabel("Loss",fontsize = 30)
+# ax.set_xlabel("Iteration",fontsize = 30)
+# ax.set_ylabel("Loss",fontsize = 30)
 
-ax.set_xlim(0, iteration_all)
+# ax.set_xlim(0, iteration_all)
 
-min_loss = min(min(gL_list), min(dL_list))
-max_loss = max(max(gL_list), max(dL_list))
-ax.set_ylim(min_loss, max_loss)
+# min_loss = min(min(gL_list), min(dL_list))
+# max_loss = max(max(gL_list), max(dL_list))
+# ax.set_ylim(min_loss, max_loss)
 
-ax.legend(fontsize = 30)
+# ax.legend(fontsize = 30)
 
-ax.minorticks_on()
+# ax.minorticks_on()
 
-ax.tick_params(labelsize = 30, which = "both", direction = "in")
-plt.tight_layout()
-plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/training_proceed.svg", dpi=600, bbox_inches='tight')
-plt.close()
+# ax.tick_params(labelsize = 30, which = "both", direction = "in")
+# plt.tight_layout()
+# plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/training_proceed.svg", dpi=600, bbox_inches='tight')
+# plt.close()
 
 
 #!!!!!!!!!!!!!!!!!!テキストファイル用!!!!!!!!!!!!!!!!!!!!!!!
@@ -810,7 +810,7 @@ ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
 
 # x軸とy軸の範囲設定
 ax.set_xlim(0, 10)  # x軸を0～10に設定
-ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
+ax.set_ylim(-2.0e10, 2.0e10)  # y軸の範囲は指定通り
 
 ax.minorticks_on()
 ax.tick_params(labelsize=27, which="both", direction="in")
@@ -837,7 +837,7 @@ ax.set_xlabel("Time ns",fontsize = 30)
 ax.set_ylabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=30)
 
 ax.set_xlim(0, 10)  # x軸を0～10に設定
-ax.set_ylim(-1.6e10, 1.6e10)  # y軸の範囲は指定通り
+ax.set_ylim(-2.0e10, 2.0e10)  # y軸の範囲は指定通り
 
 # ax.legend(fontsize = 30)
 
@@ -882,7 +882,7 @@ for x_min, x_max in x_ranges:
     
     # Set x-axis range
     ax.set_xlim(x_min, x_max)
-    ax.set_ylim(-1.6e10, 1.6e10)
+    ax.set_ylim(-2.0e10, 2.0e10)
 
     ax.minorticks_on()
     ax.tick_params(labelsize=27, which="both", direction="in")
@@ -907,7 +907,7 @@ for x_min, x_max in x_ranges:
 
     # Set x-axis range
     ax.set_xlim(x_min, x_max)  
-    ax.set_ylim(-1.6e10, 1.6e10)
+    ax.set_ylim(-2.0e10, 2.0e10)
 
     ax.minorticks_on()
     ax.tick_params(labelsize=27, which="both", direction="in")
@@ -923,21 +923,21 @@ for x_min, x_max in x_ranges:
 orbits_flat = orbits.flatten()
 correct_disp_flat = correct_disp.flatten()  # 事前にフラット化
 
-# # -------------熱流束の予測データを保存（時間がかかりそうなのでコメントアウトすることも検討）-------------
+# -------------熱流束の予測データを保存（時間がかかりそうなのでコメントアウトすることも検討）-------------
 
-# # 1e-6ずつ増加する値をdata_stepの長さの配列に設定
-# time_steps = np.arange(0, data_step * 1e-6, 1e-6)
+# 1e-6ずつ増加する値をdata_stepの長さの配列に設定
+time_steps = np.arange(0, data_step * 1e-6, 1e-6)
 
-# # 必要に応じてサイズを調整（例としてdata_stepが3e7の場合）
-# time_steps = time_steps[:data_step]
+# 必要に応じてサイズを調整（例としてdata_stepが3e7の場合）
+time_steps = time_steps[:data_step]
 
-# # 時間ステップとorbitsデータを結合
-# data = np.column_stack((time_steps, orbits_flat))
+# 時間ステップとorbitsデータを結合
+data = np.column_stack((time_steps, orbits_flat))
 
-# # DataFrame にして .dat ファイルとして保存
-# df = pd.DataFrame(data, columns=["Time", "Pred"])
-# df.to_csv(f"/home/kawaguchi/result/" + result_dir + "/" + DATA_filename + "_pred.dat", sep=" ", index=False)
-# # #--------------------------
+# DataFrame にして .dat ファイルとして保存
+df = pd.DataFrame(data, columns=["Time", "Pred"])
+df.to_csv(f"/home/kawaguchi/result/" + result_dir + "/" + DATA_filename + "_pred.dat", sep=" ", index=False)
+# #--------------------------
 # -------------熱流束データの確率密度分布-------------
 
 # グラフを作成
@@ -1062,11 +1062,11 @@ for i in range(numEnsemble):
 md_time = np.arange(1,stepPlot+1)*dt*fs/ps*stpRecord
 
 # データを結合（2列にする）
-# ACF_true_data = np.column_stack((md_time, ACF_true))
+ACF_true_data = np.column_stack((md_time, ACF_true))
 ACF_pred_data = np.column_stack((md_time, ACF_pred))
 
 # ファイルに保存
-# np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.dat", ACF_true_data, delimiter=" ", header="md_time,ACF_true", comments="")
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_true.dat", ACF_true_data, delimiter=" ", header="md_time,ACF_true", comments="")
 np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ACF_pred.dat", ACF_pred_data, delimiter=" ", header="md_time,ACF_pred", comments="")
 
 #figure detail
@@ -1082,7 +1082,7 @@ plt.plot(md_time,ACF_pred,color='blue')
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
+plt.ylabel(r"ACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # ax.set_ylim(-3e18, 10e18)
 
@@ -1112,7 +1112,7 @@ plt.plot(md_time,ACF_true,color="red")
 
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
+plt.ylabel(r"ACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # ax.set_ylim(-3e18, 10e18)
 
@@ -1138,11 +1138,11 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 #------------------------
 
-plt.plot(md_time,ACF_pred,color="blue")
-plt.plot(md_time,ACF_true,color="red")
+plt.plot(md_time,ACF_true,color="red", label="MD")
+plt.plot(md_time,ACF_pred,color="blue", label="GANs")
 
 plt.xlabel("Time ps",fontsize = 30)
-plt.ylabel(r"HFACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
+plt.ylabel(r"ACF $(\mathrm{W} / \mathrm{m}^2)^2$", fontsize=30)
 
 # 凡例を追加
 ax.legend(fontsize=30, loc='upper left', frameon=True)
@@ -1180,25 +1180,25 @@ ITR_pred = np.zeros((stepPlot-1))
 
 for i in range(0,stepPlot-1-1):
 
-    # integration_true[i+1] = integration_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*timeInterval*ps
+    integration_true[i+1] = integration_true[i] + ((ACF_true[i]+ACF_true[i+1])/2.0)*timeInterval*ps
 
     integration_pred[i+1] = integration_pred[i] + ((ACF_pred[i]+ACF_pred[i+1])/2.0)*timeInterval*ps
     pass
 
 for i in range(1, stepPlot-1):
 
-    # ITR_true[i] = boltz*T**2/area/integration_true[i]
+    ITR_true[i] = boltz*T**2/area/integration_true[i]
     ITR_pred[i] = boltz*T**2/area/integration_pred[i]
     pass
 
 md_time = np.arange(1,stepPlot)*dt*fs*stpRecord/ps
 
 # データを結合（2列にする）
-# ITR_true_data = np.column_stack((md_time, ITR_true))
+ITR_true_data = np.column_stack((md_time, ITR_true))
 ITR_pred_data = np.column_stack((md_time, ITR_pred))
 
 # ファイルに保存
-# np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.dat", ITR_true_data, delimiter=" ", header="md_time,ITR_true", comments="")
+np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_true.dat", ITR_true_data, delimiter=" ", header="md_time,ITR_true", comments="")
 np.savetxt(r"/home/kawaguchi/result/" + result_dir + "/ITR_pred.dat", ITR_pred_data, delimiter=" ", header="md_time,ITR_pred", comments="")
 
 # #------------------------
@@ -1288,15 +1288,14 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # ax.axvspan(int(0.6*stepPlot)*dt*10**(-3)*stpRecord,stepPlot*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
-plt.plot(md_time,ITR_pred,color="blue")
-plt.plot(md_time,ITR_true,color="red")
-
+plt.plot(md_time,ITR_true,color="red", label="MD")
+plt.plot(md_time,ITR_pred,color="blue", label="GANs")
 
 plt.xlabel("Time ps",fontsize = 30)
 plt.ylabel(r"ITR $\mathrm{K} \cdot \mathrm{m}^2 / \mathrm{W}$", fontsize=30)
 
 # 凡例を追加
-ax.legend(fontsize=30, loc='upper left', frameon=True)
+ax.legend(fontsize=30, loc='upper right', frameon=True)
 
 plt.minorticks_on()
 
@@ -1402,15 +1401,15 @@ ax.yaxis.set_major_formatter(ptick.ScalarFormatter(useMathText=True))
 
 # ax.axvspan(int(0.6*nmsdtime)*dt*10**(-3)*stpRecord,nmsdtime*dt*10**(-3)*stpRecord,color = "coral",alpha = 0.5)
 
-plt.plot(md_time,1/ITR_pred,color="blue")
-plt.plot(md_time,1/ITR_true,color="red")
+plt.plot(md_time,1/ITR_true,color="red", label="MD")
+plt.plot(md_time,1/ITR_pred,color="blue", label="GANs")
 
 
 plt.xlabel("Time ps",fontsize = 30)
 plt.ylabel(r"ITC $\mathrm{W} / (\mathrm{K} \cdot \mathrm{m}^2)$", fontsize=30)
 
 # 凡例を追加
-ax.legend(fontsize=30, loc='upper left', frameon=True)
+ax.legend(fontsize=30, loc='upper right', frameon=True)
 
 plt.minorticks_on()
 
@@ -1421,16 +1420,16 @@ plt.show()
 plt.savefig(r"/home/kawaguchi/result/" + result_dir + "/ITC_pred_and_true.svg", dpi=600, bbox_inches='tight')
 plt.close()
 
-D_PREDICTED = np.average(ITR_pred[int(0.6*stepPlot):])
+D_PREDICTED = np.average(ITR_pred[int(0.5*stepPlot):])
 
-info_ad = pd.DataFrame(data=[["ITR [K · m$^2$/W]",D_PREDICTED]],columns = columns2)   # これわからん
+info_ad = pd.DataFrame(data=[["ITR_pred [K · m$^2$/W]",D_PREDICTED]],columns = columns2)   # これわからん
 info = pd.concat([info,info_ad])
 
 
-# D_CORRECT = np.average(ITR_true[int(0.6*stepPlot):])
+D_CORRECT = np.average(ITR_true[int(0.5*stepPlot):])
 
-# info_ad = pd.DataFrame(data=[["D_correct_GK [m$^2$/s]",D_CORRECT ]],columns = columns2)
-# info = pd.concat([info,info_ad])
+info_ad = pd.DataFrame(data=[["ITR_true [m$^2$/s]",D_CORRECT ]],columns = columns2)
+info = pd.concat([info,info_ad])
 
 
 info.to_csv(r"/home/kawaguchi/result/" + result_dir + "/info.txt",index = False)

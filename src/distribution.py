@@ -5,6 +5,7 @@ import matplotlib.ticker as ptick
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 from pathlib import Path  # ファイル存在チェック用
+from matplotlib.colors import LinearSegmentedColormap
 
 # --- 図のデフォルト設定の変更 ---
 plt.rcParams['font.family'] = 'Liberation Sans'
@@ -19,8 +20,11 @@ data_files = [
     "flow_check_bottom_1.dat", "flow_check_bottom_2.dat", "flow_check_bottom_3.dat"
 ]
 
-# レインボーカラーマップを使用
-colors_gradient = plt.cm.rainbow(np.linspace(0.0, 1.0, len(i_values)))
+# 鮮明な青（#0000FF）から水色（#00FFFF）へのグラデーションを作成
+custom_cmap = LinearSegmentedColormap.from_list("custom_blue_cyan", ["#0000FF", "#00FFFF"])
+
+# i_values の数に応じたグラデーションの色を取得
+colors_gradient = custom_cmap(np.linspace(1.0, 0.0, len(i_values)))
 
 
 # グラフを作成
@@ -63,18 +67,20 @@ for i, color in zip(i_values, colors_gradient):
     # 線でつなげてプロット（グラデーションを強調、線を太く）
     ax.plot(bin_centers, hist, color=color, linestyle='-', alpha=0.9, linewidth=2.5, label=f"$\\alpha$ = {i}")
 
+plt.ylim(0, 4.2e-10)
+
 # x=0 の点線を追加
 ax.axvline(x=0, color='gray', linestyle='--', linewidth=2, alpha=0.5, zorder=0)
 
 # グラフのラベルを設定
-ax.set_xlabel(r"Heat Flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)
-ax.set_ylabel('Probability Density', fontsize=25)
+ax.set_xlabel(r"Heat flux $\mathrm{W} / \mathrm{m}^2$", fontsize=25)
+ax.set_ylabel('Probability', fontsize=25)
 
 # 軸の設定
 ax.tick_params(axis='both', labelsize=27, which="both", direction="in")
 
 # 凡例を追加（背景を白にして視認性を向上）
-ax.legend(fontsize=30, loc='upper left', frameon=True, facecolor='white', edgecolor='black')
+ax.legend(fontsize=30, loc='upper left', frameon=True)
 
 plt.minorticks_on()
 plt.tight_layout()
